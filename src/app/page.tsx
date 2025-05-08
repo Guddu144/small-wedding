@@ -1,15 +1,11 @@
-"use client"
-import { SignedIn, useUser } from "@clerk/nextjs";
-import Image from "next/image";
+
+import { SignedIn, SignedOut } from "@clerk/nextjs";
+
 import Link from "next/link";
-import { auth } from '@clerk/nextjs/server'
+
 
 export default  function Home() {
-  const { user, isLoaded } = useUser();
-
-  if (!isLoaded) return <div>Loading...</div>;
-
-  const role = user?.publicMetadata?.role;
+ 
   return (
  <>
   {/* <div>
@@ -42,7 +38,15 @@ export default  function Home() {
               Go to Dashboard
             </Link>
               </SignedIn>
-           
+         
+         <SignedOut>
+     <div className="flex gap-3">
+     <Link className="text-[16px] w-fit font-semibold leading-[24px] text-[#fff] rounded-[46px] px-[16px] py-[14px] flex gap-2 items-center bg-[#000]" href={`/sign-up?role=admin`}>Signup as Admin</Link>
+              <Link className="text-[16px] w-fit font-semibold leading-[24px] text-[#fff] rounded-[46px] px-[16px] py-[14px] flex gap-2 items-center bg-[#000]" href={`/sign-up?role=venueowner`}>Signup as Venue Owner</Link>
+              <Link className="text-[16px] w-fit font-semibold leading-[24px] text-[#fff] rounded-[46px] px-[16px] py-[14px] flex gap-2 items-center bg-[#000]" href={`/sign-up?role=user`}>Signup as User</Link>
+
+     </div>
+         </SignedOut>
           </div>
 
       

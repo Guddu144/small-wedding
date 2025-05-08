@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useSignUp } from '@clerk/nextjs'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 export default function Page() {
   const { isLoaded, signUp, setActive } = useSignUp()
@@ -11,7 +11,9 @@ export default function Page() {
   const [verifying, setVerifying] = React.useState(false)
   const [code, setCode] = React.useState('')
   const router = useRouter()
-
+  const searchParams = useSearchParams()
+  const role = searchParams.get('role') 
+  console.log(role)
   // Handle submission of the sign-up form
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -24,7 +26,7 @@ export default function Page() {
         emailAddress,
         password,
         unsafeMetadata: {
-            userRole: 'Venue Owner',
+            userRole: `${role}`,
           },
       })
 

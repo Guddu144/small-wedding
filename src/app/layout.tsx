@@ -40,7 +40,7 @@ export default function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           <header className="flex justify-between items-center bg-black text-white p-4 gap-4 h-14">
-            <Link href="#" className="flex items-center ms-2 md:me-24 ">
+            <Link href="/" className="flex items-center ms-2 md:me-24 ">
               <Image
                 width={150}
                 height={150}

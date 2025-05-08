@@ -28,7 +28,7 @@ interface SearchBoxProps {
   setCurrentPage: (page: number) => void;
 }
 
-const TableInfo: React.FC<SearchBoxProps> = ({setCurrentPage, venues, loading,currentPage,totalPages ,currentData, handlePrev , handleNext }) => {
+const TableInfo: React.FC<SearchBoxProps> = ({userRole,setCurrentPage, venues, loading,currentPage,totalPages ,currentData, handlePrev , handleNext }) => {
   return (
     <div>
     <div className="pt-4 relative overflow-x-auto shadow-md sm:rounded-lg">
@@ -39,7 +39,7 @@ const TableInfo: React.FC<SearchBoxProps> = ({setCurrentPage, venues, loading,cu
             <th className="px-6 py-3">Description</th>
             <th className="px-6 py-3">VenueId</th>
             <th className="px-6 py-3">Email</th>
-            <th className="px-6 py-3">Action</th>
+            {userRole =="admin" ?    <th className="px-6 py-3">Action</th> :''}
           </tr>
         </thead>
         <tbody>
@@ -63,20 +63,22 @@ const TableInfo: React.FC<SearchBoxProps> = ({setCurrentPage, venues, loading,cu
                   :''}
                 </td>
                 <td className="px-6 py-4">{item?.email}</td>
-                <td className="px-6 py-4 text-right flex gap-3 items-center">
-                  <Link
-                    href={`/dashboard/venue/update/${item?.venueId}`}
-                    className="font-medium bg-blue-600 text-white px-4 py-1 rounded hover:underline"
-                  >
-                    Edit
-                  </Link>
-                  <Link
-                    href="#"
-                    className="font-medium bg-red-600 text-white px-4 py-1 rounded hover:underline"
-                  >
-                    Delete
-                  </Link>
-                </td>
+               {userRole =="admin" ?
+               <td className="px-6 py-4 text-right flex gap-3 items-center">
+               <Link
+                 href={`/dashboard/venue/update/${item?.venueId}`}
+                 className="font-medium bg-blue-600 text-white px-4 py-1 rounded hover:underline"
+               >
+                 Edit
+               </Link>
+               <Link
+                 href="#"
+                 className="font-medium bg-red-600 text-white px-4 py-1 rounded hover:underline"
+               >
+                 Delete
+               </Link>
+             </td>:"" 
+              }
               </tr>
             ))
           ) : (

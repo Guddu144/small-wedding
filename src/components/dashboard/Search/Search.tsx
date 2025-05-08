@@ -33,7 +33,7 @@ interface SearchBoxProps {
   setCurrentPage: (page: number) => void;
 }
 
-const SearchBox: React.FC<SearchBoxProps> = ({ setCurrentPage,venues, loading,currentPage,totalPages,currentData, handlePrev , handleNext }) => {
+const SearchBox: React.FC<SearchBoxProps> = ({ userRole,setCurrentPage,venues, loading,currentPage,totalPages,currentData, handlePrev , handleNext }) => {
   const [query, setQuery] = useState("");
 
   const filteredAmiibos = venues.filter(
@@ -85,7 +85,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({ setCurrentPage,venues, loading,cu
       </div>
    </div>
      
-      <TableInfo setCurrentPage={setCurrentPage} currentPage={currentPage} totalPages={totalPages} currentData={currentData} handlePrev={handlePrev} handleNext={handleNext} venues={filteredAmiibos} loading={loading} />
+      <TableInfo userRole={userRole} setCurrentPage={setCurrentPage} currentPage={currentPage} totalPages={totalPages} currentData={currentData} handlePrev={handlePrev} handleNext={handleNext} venues={filteredAmiibos} loading={loading} />
     </>
   );
 };

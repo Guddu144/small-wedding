@@ -20,7 +20,7 @@ interface Venue{
   venue_status:string
   gallery: string[];
 }
-const Dashboard = () => {
+const Dashboard = ({userRole}) => {
   const [venues, setVenues] = useState<Venue[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -62,7 +62,7 @@ const Dashboard = () => {
         {/* <Charts />
         <Charts2 /> */}
       </div>
-      <SearchBox setCurrentPage={setCurrentPage} currentPage={currentPage} totalPages={totalPages} currentData={currentData} handlePrev={handlePrev} handleNext={handleNext} venues={venues} loading={loading} />
+      <SearchBox userRole={userRole} setCurrentPage={setCurrentPage} currentPage={currentPage} totalPages={totalPages} currentData={currentData} handlePrev={handlePrev} handleNext={handleNext} venues={venues} loading={loading} />
 
     </div>
   );
