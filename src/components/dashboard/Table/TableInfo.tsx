@@ -50,6 +50,7 @@ const TableInfo: React.FC<SearchBoxProps> = ({
               <th className="px-6 py-3">Description</th>
               <th className="px-6 py-3">VenueId</th>
               <th className="px-6 py-3">Email</th>
+              <th className="px-6 py-3">Location</th>
               {userRole == "admin" ? <th className="px-6 py-3">Action</th> : ""}
             </tr>
           </thead>
@@ -86,6 +87,10 @@ const TableInfo: React.FC<SearchBoxProps> = ({
                     )}
                   </td>
                   <td className="px-6 py-4">{item?.email}</td>
+                  <td className="px-6 py-4">
+                    {item?.venue_location}
+                  </td>
+                
                   {userRole == "admin" ? (
                     <td className="px-6 py-4 text-right flex gap-3 items-center">
                       <Link

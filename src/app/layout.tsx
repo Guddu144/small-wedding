@@ -54,7 +54,7 @@ export default function RootLayout({
            <SignedOut>
              <div className="flex gap-4">
              <SignInButton mode="modal" forceRedirectUrl="/dashboard" />
-              <SignUpButton mode="modal" forceRedirectUrl="/dashboard" />
+              {/* <SignUpButton mode="modal" forceRedirectUrl="/dashboard" /> */}
               <CreateOrganization/>
               <OrganizationProfile />
              </div>
