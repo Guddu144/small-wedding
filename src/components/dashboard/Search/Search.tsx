@@ -31,7 +31,9 @@ interface SearchBoxProps {
   venues: Venue[];
   loading: boolean;
   setCurrentPage: (page: number) => void;
+  userRole:string
 }
+
 
 const SearchBox: React.FC<SearchBoxProps> = ({ userRole,setCurrentPage,venues, loading,currentPage,totalPages,currentData, handlePrev , handleNext }) => {
   const [query, setQuery] = useState("");

@@ -20,7 +20,11 @@ interface Venue{
   venue_status:string
   gallery: string[];
 }
-const Dashboard = ({userRole}) => {
+
+interface UserProps{
+  userRole:string
+}
+const Dashboard:React.FC<UserProps> = ({userRole}) => {
   const [venues, setVenues] = useState<Venue[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
