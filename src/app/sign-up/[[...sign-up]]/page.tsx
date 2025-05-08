@@ -24,8 +24,7 @@ export default function Page() {
         emailAddress,
         password,
         unsafeMetadata: {
-            userRole: 'venue-owner',
-            source: 'landing-page',
+            userRole: 'Venue Owner',
           },
       })
 
