@@ -1,7 +1,18 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
+import {
+  ClerkProvider,
+  CreateOrganization,
+  OrganizationProfile,
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/nextjs";
+import Link from "next/link";
+import Image from "next/image";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -23,12 +34,40 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          <header className="flex justify-between items-center bg-black text-white p-4 gap-4 h-14">
+            <Link href="#" className="flex items-center ms-2 md:me-24 ">
+              <Image
+                width={150}
+                height={150}
+                src="/images/logo.png"
+                className="h-12 me-3 "
+                alt="Logo"
+              />
+              {/* email scripting */}
+            </Link>
+     
+           <SignedOut>
+             <div className="flex gap-4">
+             <SignInButton mode="modal" forceRedirectUrl="/dashboard" />
+              <SignUpButton mode="modal" forceRedirectUrl="/dashboard" />
+              <CreateOrganization/>
+              <OrganizationProfile />
+             </div>
+            </SignedOut>
+          
+            <SignedIn>
+              <UserButton />
+              
+            </SignedIn>
+          </header>
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
