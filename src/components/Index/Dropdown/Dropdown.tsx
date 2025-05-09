@@ -52,12 +52,12 @@ const DropdownMenu: React.FC = () => {
         <div className="absolute z-10 mt-2 bg-white divide-y divide-gray-500 rounded-lg shadow-sm w-44 border border-gray-200">
           <div className="py-1 text-sm text-gray-700 ">
            
-              <Link
+              {/* <Link
                 className="block px-4 py-2 hover:bg-gray-100"
                 href={`/sign-up?role=admin`}
               >
                 Signup as Admin
-              </Link>
+              </Link> */}
        
            
               <Link
