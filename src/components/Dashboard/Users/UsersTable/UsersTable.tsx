@@ -31,10 +31,10 @@ const UsersTable: React.FC<PropsUserData> = ({ data, userRole }) => {
     }
   };
 
-  const handleDelete = async (user_id: string) => {
-    await deleteUser(user_id);
-    router.push("/dashboard"); // Optionally trigger a refresh
-  };
+const handleDelete = async (user_id: string) => {
+  await deleteUser(user_id);
+  window.location.reload(); // Hard refresh the page
+};
 
   return (
     <div className="pt-4 relative overflow-x-auto shadow-md sm:rounded-lg">

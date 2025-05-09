@@ -127,10 +127,9 @@ const [formData, setFormData] = useState<{
       console.log("Response:", data);
 
       if (res.ok) {
-        alert("Venue updated successfully!");
-        router.push("/dashboard");
-        
-      } else {
+  alert("Venue updated successfully!");
+  window.location.href = "/dashboard"; // Triggers a full page reload to /dashboard
+} else {
         alert("Error: " + data.error);
       }
     } catch (error) {

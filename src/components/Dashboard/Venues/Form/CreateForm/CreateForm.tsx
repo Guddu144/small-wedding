@@ -69,7 +69,7 @@ const CreateForm = () => {
 
       if (res.ok) {
         alert("Venue added successfully!");
-        router.push('/dashboard')
+         window.location.reload(); // Hard refresh the page
       } else {
         alert("Error: " + data.error);
       }

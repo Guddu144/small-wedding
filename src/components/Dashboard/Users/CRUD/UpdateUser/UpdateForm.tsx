@@ -87,7 +87,8 @@ const UpdateUserForm: React.FC<PropsSlug> = ({ slug }) => {
       const data = await res.json();
       if (res.ok) {
         alert("User updated successfully!");
-        router.push("/dashboard");
+        router.push("/dashboard/users");
+         window.location.reload(); // Hard refresh the page
       } else {
         alert("Error: " + data.error);
       }
