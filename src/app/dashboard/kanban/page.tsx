@@ -1,8 +1,8 @@
-import Dashboard from "@/components/dashboard/Dashboard";
+import Dashboard from "@/components/Dashboard/Venues/Venues";
 
 const page = () => {
   return <>
-    <Dashboard/>
+  
   </>;
 };
 

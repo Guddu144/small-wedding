@@ -3,7 +3,13 @@ import { SignedIn, SignedOut } from "@clerk/nextjs";
 
 import Link from "next/link";
 
-
+import HeroSection from '@/components/Index/HeroSection';
+import Navbar from '@/components/Index/Navbar';
+import AboutSection from '@/components/Index/AboutSection';
+import ServicesSection from '@/components/Index/ServicesSection';
+import VenueSection from '@/components/Index/VenueSection';
+import TestimonialsSection from '@/components/Index/TestimonialsSection';
+import FooterSection from '@/components/Index/FooterSection'
 export default  function Home() {
  
   return (
@@ -12,7 +18,31 @@ export default  function Home() {
       <h1>Welcome, {user.firstName}!</h1>
       <p>Your role is: {role}</p>
     </div> */}
- <div className="abolute top-0 bg_image_main flex flex-col justify-center h-full ">
+<main className="min-h-screen bg-navy-900 ">
+      {/* Navigation Bar */}
+      {/* <Navbar /> */}
+
+      {/* Hero Section */}
+      <HeroSection />
+
+      {/* About Section */}
+      <AboutSection />
+
+      {/* Services Section */}
+      <ServicesSection />
+
+      {/* Venues Section */}
+      <VenueSection />
+
+      {/* Testimonials Section */}
+      <TestimonialsSection />
+
+      {/* Footer Section */}
+      <FooterSection />
+
+      {/* Additional sections would go here */}
+    </main>
+ {/* <div className="abolute top-0 bg_image_main flex flex-col justify-center h-full ">
       <div className="main_container inside_sidespace    ">
         <div className="flex justify-between gap-6 items-end">
           <div className="max-w-[532px] flex flex-col">
@@ -53,7 +83,7 @@ export default  function Home() {
          
         </div>
       </div>
-    </div>
+    </div> */}
     </>
   );
 }

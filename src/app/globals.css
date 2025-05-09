@@ -35,6 +35,18 @@ body {
   background: #fff;
 
 }
+/* Hero section styles */
+section.relative {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Video background styles */
+video.absolute {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
 
 .bg_image_main{
   background-image: 

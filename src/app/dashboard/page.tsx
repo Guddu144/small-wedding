@@ -1,6 +1,7 @@
 
-import Dashboard from "@/components/dashboard/Dashboard";
 import { currentUser } from "@clerk/nextjs/server";
+import RegisterUser from "../../components/Dashboard/Users/CRUD/RegisterUser";
+import Venues from "@/components/Dashboard/Venues/Venues";
 
 
 const page = async() => {
@@ -13,7 +14,8 @@ const page = async() => {
     {userRole}
   </span>
 </h1>
-    <Dashboard userRole={userRole}/>
+<RegisterUser/>
+    <Venues userRole={userRole}/>
     {/* {userRole == "admin" ?   <Dashboard userRole={userRole}/> : userRole=="venueowner" ? "Venue Dashboard" : "User Dashboard"} */}
 
   </>;

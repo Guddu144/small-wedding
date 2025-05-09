@@ -11,7 +11,7 @@ const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
       {/* Navbar */}
-      <nav className="fixed top-0 z-50 w-full bg-[#fdfdfd] border-b border-gray-200 ">
+      <nav className="fixed top-0 z-90 w-full bg-[#fdfdfd] border-b border-gray-200 h-[4.1rem]">
         <div className="px-3 py-3 lg:px-5 lg:pl-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -30,12 +30,15 @@ const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
                   />
                 </svg>
               </button>
-              <Link href="#" className="flex items-center ms-2 md:me-24 ">
-                <Image width={40} height={40} src="/images/logo2.png" className="h-8 me-3 " alt="Logo" />
-                <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap">
-                Small Wedding
-                </span>
-              </Link>
+               <Link className='bg-[#000]' href="/" aria-label="Celebration of Life Concierge">
+            <Image 
+              src="/images/logos/logo.svg" 
+              alt="Celebration of Life Concierge" 
+              width={200} 
+              height={50}
+              priority
+            />
+          </Link>
             </div>
             {/* User menu */}
             <div className="relative ms-3">
@@ -110,7 +113,9 @@ const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
       setSidebarOpen(false);
     }
   }}>
-        {children} {/* Render children here, outside of the sidebar */}
+       <div className='mt-20'>
+         {children}
+         </div> {/* Render children here, outside of the sidebar */}
       </main>
     </>
   );

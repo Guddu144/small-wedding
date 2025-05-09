@@ -1,14 +1,15 @@
 import React from "react";
 import { fetchGetSingleVenueData } from "../../../../../../utils/dashboard";
 
-interface ParamsProps {
-  params: {
-    slug: string;
-  };
-}
+type Params = Promise<{ slug: string }>
 
-const Page = async ({ params }: ParamsProps) => {
-  const { slug } = params;
+export default async function Page(props: {
+  params: Params
+
+}) {
+  const params = await props.params
+
+  const slug = params.slug
   const fetchData = await fetchGetSingleVenueData(slug);
   const venue = fetchData?.result;
 
@@ -32,4 +33,4 @@ const Page = async ({ params }: ParamsProps) => {
   );
 };
 
-export default Page;
+

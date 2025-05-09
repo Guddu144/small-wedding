@@ -1,4 +1,4 @@
-import CreateForm from '@/components/dashboard/Form/CreateForm/CreateForm'
+import CreateForm from '@/components/Dashboard/Venues/Form/CreateForm/CreateForm'
 import React from 'react'
 
 const page = () => {

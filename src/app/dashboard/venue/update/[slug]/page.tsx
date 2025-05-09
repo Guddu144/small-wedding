@@ -1,20 +1,21 @@
-import UpdateForm from '@/components/dashboard/Form/UpdateForm/UpdateForm'
-import React from 'react'
+import React from 'react';
+import UpdateForm from '@/components/Dashboard/Venues/Form/UpdateForm/UpdateForm';
 
-interface ParamsProps {
-  params: {
-    slug: string;
-  };
-}
-const page = ({params}: ParamsProps) => {
-  const {slug}=params
-  console.log(slug)
+type Params = Promise<{ slug: string }>
+
+export default async function Page(props: {
+  params: Params
+
+}) {
+  const params = await props.params
+
+  const slug = params.slug
+
   return (
     <div>
-  
-      <UpdateForm slug={slug}/>
+      <UpdateForm slug={slug} />
     </div>
-  )
-}
+  );
+};
 
-export default page
+
