@@ -19,8 +19,7 @@ export default  function Home() {
       <p>Your role is: {role}</p>
     </div> */}
 <main className="min-h-screen bg-navy-900 ">
-      {/* Navigation Bar */}
-      {/* <Navbar /> */}
+ 
 
       {/* Hero Section */}
       <HeroSection />
