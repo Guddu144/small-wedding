@@ -83,14 +83,7 @@ export default function HeroSection() {
           </Link>
         </div>
               
-         <SignedOut>
-     <div className="flex justify-center mt-5 gap-3 z-9999">
-     <Link className="px-6 py-4 bg-gradient-to-b from-white/0 to-white/30 rounded-[10px] outline outline-1 outline-offset-[-1px] outline-white/40 inline-flex justify-center items-center gap-2 w-full sm:w-auto" href={`/sign-up?role=admin`}>Signup as Admin</Link>
-              <Link className="px-6 py-4 bg-gradient-to-b from-white/0 to-white/30 rounded-[10px] outline outline-1 outline-offset-[-1px] outline-white/40 inline-flex justify-center items-center gap-2 w-full sm:w-auto" href={`/sign-up?role=venueowner`}>Signup as Venue Owner</Link>
-              <Link className="px-6 py-4 bg-gradient-to-b from-white/0 to-white/30 rounded-[10px] outline outline-1 outline-offset-[-1px] outline-white/40 inline-flex justify-center items-center gap-2 w-full sm:w-auto" href={`/sign-up?role=user`}>Signup as User</Link>
-
-     </div>
-         </SignedOut>
+        
       </div>
     </section>
   );

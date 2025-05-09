@@ -1,7 +1,7 @@
-"use client"; // If this is a client-side component
-import Image from "next/image";
-import Link from "next/link";
+"use client";
 import React from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Pagination from "./Pagination";
 
 interface Venue {
@@ -18,6 +18,7 @@ interface Venue {
   venue_status: string;
   gallery: string[];
 }
+
 interface SearchBoxProps {
   currentPage: number;
   totalPages: number;
@@ -41,80 +42,105 @@ const TableInfo: React.FC<SearchBoxProps> = ({
   handlePrev,
   handleNext,
 }) => {
+  const router = useRouter();
+  const sortedData = [...currentData].reverse();
+
+  const deleteVenue = async (venue_id: string) => {
+    try {
+      const res = await fetch(
+        `/api/venues/delete?venue_id=${venue_id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error("Failed to delete venue");
+      }
+
+      router.refresh(); // Refresh the current route to reload data
+    } catch (error) {
+      console.error("Delete error:", error);
+    }
+  };
+
+  const handleDelete = async (venue_id: string) => {
+    if (confirm("Are you sure you want to delete this venue?")) {
+      await deleteVenue(venue_id);
+    }
+  };
+
   return (
     <div>
       <div className="pt-4 relative overflow-x-auto shadow-md sm:rounded-lg">
-        <table className="w-full text-sm text-left rtl:text-right text-gray-500">
+        <table className="w-full text-sm text-left text-gray-500">
           <thead className="text-xs text-gray-700 uppercase bg-gray-200">
             <tr>
-              <th className="px-6 py-3">Venue name</th>
+              <th className="px-6 py-3">Venue Name</th>
               <th className="px-6 py-3">Description</th>
               <th className="px-6 py-3">VenueId</th>
               <th className="px-6 py-3">Email</th>
               <th className="px-6 py-3">Location</th>
-              {userRole == "admin" ? <th className="px-6 py-3">Action</th> : ""}
+              {["admin", "venueowner"].includes(userRole) && (
+                <th className="px-6 py-3">Action</th>
+              )}
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={5} className="px-6 py-4 text-center">
+                <td colSpan={6} className="text-center py-4">
                   Loading...
                 </td>
               </tr>
-            ) : currentData.length > 0 ? (
-              currentData.map((item, index) => (
+            ) : sortedData.length > 0 ? (
+              sortedData.map((item, index) => (
                 <tr key={index} className="bg-white border-b hover:bg-gray-50">
                   <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap hover:underline">
-                    <Link href={`/dashboard/venue/view/${item?.venueId}`}>
-                      {item?.venue_name}
+                    <Link href={`/dashboard/venue/view/${item.venueId}`}>
+                      {item.venue_name}
                     </Link>
                   </td>
-                  <td className="px-6 py-4">{item?.description}</td>
+                  <td className="px-6 py-4">{item.description}</td>
                   <td className="px-6 py-4">
-                    {item?.venueId}
-                    {item?.gallery ? (
+                    {item.venueId}
+                    {item.gallery && (
                       <img
-                        className="w-20 h-20"
-                        src={`${
-                          item?.gallery[0]
-                            ? `${item?.gallery[0]}`
-                            : "https://www.theestateyountville.com/wp-content/uploads/2023/09/The-Estate-Yountville-Partner-Assets-DJI_0045-1_R-820x460.jpg"
-                        }`}
-                        alt="dashboard"
+                        className="w-20 h-20 mt-2 object-cover"
+                        src={
+                          item.gallery[0] ||
+                          "https://www.theestateyountville.com/wp-content/uploads/2023/09/The-Estate-Yountville-Partner-Assets-DJI_0045-1_R-820x460.jpg"
+                        }
+                        alt="venue"
                       />
-                    ) : (
-                      ""
                     )}
                   </td>
-                  <td className="px-6 py-4">{item?.email}</td>
-                  <td className="px-6 py-4">
-                    {item?.venue_location}
-                  </td>
-                
-                  {userRole == "admin" ? (
+                  <td className="px-6 py-4">{item.email}</td>
+                  <td className="px-6 py-4">{item.venue_location}</td>
+                  {["admin", "venueowner"].includes(userRole) && (
                     <td className="px-6 py-4 text-right flex gap-3 items-center">
                       <Link
-                        href={`/dashboard/venue/update/${item?.venueId}`}
+                        href={`/dashboard/venue/update/${item.venueId}`}
                         className="font-medium bg-blue-600 text-white px-4 py-1 rounded hover:underline"
                       >
                         Edit
                       </Link>
-                      <Link
-                        href="#"
+                      <button
+                        onClick={() => handleDelete(item?.venueId)}
                         className="font-medium bg-red-600 text-white px-4 py-1 rounded hover:underline"
                       >
                         Delete
-                      </Link>
+                      </button>
                     </td>
-                  ) : (
-                    ""
                   )}
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="text-center px-6 py-4">
+                <td colSpan={6} className="text-center px-6 py-4">
                   No data found.
                 </td>
               </tr>
@@ -122,7 +148,6 @@ const TableInfo: React.FC<SearchBoxProps> = ({
           </tbody>
         </table>
 
-        {/* Pagination Controls */}
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}

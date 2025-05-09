@@ -28,7 +28,7 @@ const Venues:React.FC<UserProps> = ({userRole}) => {
   const [venues, setVenues] = useState<Venue[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 24;
 
   const fetchNewData = async () => {
     try {

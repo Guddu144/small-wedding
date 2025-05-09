@@ -84,7 +84,7 @@ const UsersTable: React.FC<PropsUserData> = ({ data, userRole }) => {
                     ? new Date(user.lastActiveAt).toLocaleString()
                     : "N/A"}
                 </td>
-                {userRole === "admin" ? (
+                {userRole === "admin" || userRole === "venueowner" ? (
                   <td className="px-6 py-4 text-right flex gap-3 items-center">
                     <Link
                       href={`/dashboard/users/update/${user?.id}`}

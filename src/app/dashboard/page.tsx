@@ -14,7 +14,7 @@ const page = async() => {
     {userRole}
   </span>
 </h1>
-<RegisterUser/>
+{/* <RegisterUser/> */}
     <Venues userRole={userRole}/>
     {/* {userRole == "admin" ?   <Dashboard userRole={userRole}/> : userRole=="venueowner" ? "Venue Dashboard" : "User Dashboard"} */}
 
