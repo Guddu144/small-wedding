@@ -6,7 +6,7 @@ export async function GET(request:Request) {
       headers: {
         Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
       },
-      next: { revalidate: 0.1 }, // Revalidate the cache every 50 seconds
+      next: { revalidate: 0 }, // Revalidate the cache every 50 seconds
     };
 
     const response = await fetch(

@@ -3,7 +3,7 @@ export const fetchOfficeData = async () => {
       const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/office`,{
         headers: {
           'Content-Type': 'application/json'
-        }, next:{revalidate:0.1}
+        }, next:{revalidate:0}
       });
       const data = await res.json();
       console.log(data);
@@ -19,7 +19,7 @@ export const fetchGetVenueData = async (page = 1, limit = 9) => {
       headers: {
         "Content-Type": "application/json",
       },
-      next: { revalidate: 0.1 },
+      next: { revalidate: 0 },
     });
     const data = await res.json();
     return data;
@@ -35,7 +35,7 @@ export const fetchGetVenueData = async (page = 1, limit = 9) => {
       const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/venues/getone?venue_id=${venue_id}`,{
         headers: {
           'Content-Type': 'application/json'
-        }, next:{revalidate:0.1}
+        }, next:{revalidate:0}
       });
       const data = await res.json();
       console.log(data);
