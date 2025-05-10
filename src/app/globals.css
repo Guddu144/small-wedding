@@ -35,6 +35,11 @@ body {
   background: #fff;
 
 }
+
+.cl-internal-4x6jej {
+    box-sizing: border-box;
+    display: none !important;
+}
 /* Hero section styles */
 section.relative {
   position: relative;
