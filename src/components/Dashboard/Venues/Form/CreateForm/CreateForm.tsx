@@ -7,8 +7,8 @@ const CreateForm = () => {
   const router=useRouter()
  const [formData, setFormData] = useState<{
   user_role: string;
-  venueId: string;
-  serial_no: string;
+  // venueId: string;
+  // serial_no: string;
   venue_user: string;
   venue_name: string;
   phone_no: string;
@@ -17,13 +17,13 @@ const CreateForm = () => {
   region_state: string;
   featured_venue: boolean;
   gallery: string[]; 
-  venue_status: string;
+  // venue_status: string;
   description: string;
   venue_type: string;
 }>({
   user_role: "admin",
-  venueId: "",
-  serial_no: "",
+  // venueId: "",
+  // serial_no: "",
   venue_user: "",
   venue_name: "",
   phone_no: "",
@@ -32,7 +32,7 @@ const CreateForm = () => {
   region_state: "",
   featured_venue: false,
   gallery: [],
-  venue_status: "active",
+  // venue_status: "active",
   description: "",
   venue_type: "event",
 });
@@ -85,15 +85,15 @@ const CreateForm = () => {
 <div className="DialogContent2 ">
     <h1 className="text-center text-2xl pt-4 pb-8 font-semibold">Create a New Item</h1>
 <form onSubmit={handleSubmit} className=" grid md:grid-cols-2 gap-x-3 w-full max-w-2xl mx-auto space-y-4">
-  <div>
+  {/* <div>
     <label htmlFor="venueId" className="block text-sm font-medium text-gray-700">Venue ID</label>
     <input id="venueId" type="text" value={formData.venueId} onChange={handleChange} required className="w-full rounded border p-2" />
-  </div>
+  </div> */}
 
-  <div>
+  {/* <div>
     <label htmlFor="serial_no" className="block text-sm font-medium text-gray-700">Serial No</label>
     <input id="serial_no" type="text" value={formData.serial_no} onChange={handleChange} required className="w-full rounded border p-2" />
-  </div>
+  </div> */}
 
   <div>
     <label htmlFor="venue_user" className="block text-sm font-medium text-gray-700">Venue User</label>
@@ -135,10 +135,10 @@ const CreateForm = () => {
     <input id="venue_type" type="text" value={formData.venue_type} onChange={handleChange} required className="w-full rounded border p-2" />
   </div>
 
-  <div>
+  {/* <div>
     <label htmlFor="venue_status" className="block text-sm font-medium text-gray-700">Venue Status</label>
     <input id="venue_status" type="text" value={formData.venue_status} onChange={handleChange} required className="w-full rounded border p-2" />
-  </div>
+  </div> */}
 
   <div className="flex items-center gap-2">
     <input type="checkbox" id="featured_venue" checked={formData.featured_venue} onChange={handleChange} />

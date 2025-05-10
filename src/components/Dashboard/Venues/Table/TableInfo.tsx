@@ -148,13 +148,7 @@ const TableInfo: React.FC<SearchBoxProps> = ({
           </tbody>
         </table>
 
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          handlePrev={handlePrev}
-          handleNext={handleNext}
-          setCurrentPage={setCurrentPage}
-        />
+   
       </div>
     </div>
   );

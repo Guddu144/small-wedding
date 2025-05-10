@@ -47,11 +47,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
 }) => {
   const [query, setQuery] = useState("");
 
-  const filteredAmiibos = venues.filter((a) =>
-    a.venue_name?.toLowerCase().includes(query.trim().toLowerCase()) ||
-  a.venue_location?.toLowerCase().includes(query.trim().toLowerCase())
-  );
-
+ 
   return (
     <>
       <div className="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-3 md:space-y-0 pb-2 bg-white ">
@@ -99,17 +95,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
         </div>
       </div>
 
-      <TableInfo
-        userRole={userRole}
-        setCurrentPage={setCurrentPage}
-        currentPage={currentPage}
-        totalPages={Math.ceil(filteredAmiibos.length / 10)}
-        currentData={filteredAmiibos.slice((currentPage - 1) * 10, currentPage * 10)}
-        handlePrev={handlePrev}
-        handleNext={handleNext}
-        venues={filteredAmiibos}
-        loading={loading}
-      />
+  
     </>
   );
 };

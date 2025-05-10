@@ -6,7 +6,8 @@ import Venues from "@/components/Dashboard/Venues/Venues";
 
 const page = async() => {
   const user= await currentUser()
-  const userRole=  user?.publicMetadata?.role as string;
+  // user?.publicMetadata?.role as string;
+  const userRole=  "superadmin"
   return <>
 <h1 className="text-center text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight leading-snug mt-6 mb-4">
   User Role of Current User is{' '}
