@@ -11,7 +11,7 @@ const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
       {/* Navbar */}
-      <nav className="fixed top-0 z-90 w-full bg-[#fdfdfd] border-b border-gray-200 h-[4.1rem]">
+      <nav className="fixed top-0 z-90 w-full bg-[#000000] border-b border-gray-200 h-[4.1rem]">
         <div className="px-3 py-3 lg:px-5 lg:pl-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
