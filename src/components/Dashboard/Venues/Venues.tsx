@@ -96,6 +96,17 @@ const Venues: React.FC<UserProps> = ({ userRole }) => {
       await fetchNewData();
     }
   };
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+
+  const filteredVenues = venues.filter((venue) => {
+  const name = venue.venue_name.toLowerCase();
+  const country = venue.address.country.toLowerCase();
+  const term = searchTerm.toLowerCase();
+  return name.includes(term) || country.includes(term);
+});
+
   return (
     <div>
       <div className="flex gap-12">
@@ -139,6 +150,8 @@ const Venues: React.FC<UserProps> = ({ userRole }) => {
               id="table-search"
               className="block py-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-100 focus:ring-blue-500 focus:border-blue-500  "
               placeholder="Search by venue name, location"
+               value={searchTerm}
+  onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
         </div>
@@ -171,8 +184,8 @@ const Venues: React.FC<UserProps> = ({ userRole }) => {
                     </div>
                   </td>
                 </tr>
-              ) : venues.length > 0 ? (
-                venues.map((item, index) => (
+              ) : filteredVenues.length > 0 ? (
+                filteredVenues.map((item, index) => (
                   <tr
                     key={index}
                     className="bg-white border-b hover:bg-gray-50"
