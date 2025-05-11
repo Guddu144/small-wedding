@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 const CreateForm = () => {
   const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState<{
     user_role: string;
@@ -78,8 +78,8 @@ const CreateForm = () => {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    if (isSubmitting) return; // Prevent duplicate submission
-    setIsSubmitting(true);
+    if (loading) return; // Prevent duplicate submission
+    setLoading(true);
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_URL}/api/venues/post`,
@@ -103,7 +103,7 @@ const CreateForm = () => {
       console.error("Post error:", error);
       alert("Something went wrong");
     } finally {
-      setIsSubmitting(false); // Allow re-submission after process completes
+      setLoading(false); // Allow re-submission after process completes
     }
   };
 
@@ -129,6 +129,7 @@ const CreateForm = () => {
             type="text"
             value={formData.venue_user}
             onChange={handleChange}
+             disabled={loading}
             required
             className="w-full rounded border p-2"
           />
@@ -146,6 +147,7 @@ const CreateForm = () => {
             type="text"
             value={formData.venue_name}
             onChange={handleChange}
+             disabled={loading}
             required
             className="w-full rounded border p-2"
           />
@@ -163,6 +165,7 @@ const CreateForm = () => {
             type="text"
             value={formData.phone_no}
             onChange={handleChange}
+             disabled={loading}
             required
             className="w-full rounded border p-2"
           />
@@ -180,6 +183,7 @@ const CreateForm = () => {
             type="email"
             value={formData.email}
             onChange={handleChange}
+             disabled={loading}
             required
             className="w-full rounded border p-2"
           />
@@ -197,6 +201,7 @@ const CreateForm = () => {
             type="text"
             value={formData.address.country}
             onChange={handleChange}
+             disabled={loading}
             required
             className="w-full rounded border p-2"
           />
@@ -213,6 +218,7 @@ const CreateForm = () => {
             type="text"
             value={formData.address.state}
             onChange={handleChange}
+             disabled={loading}
             required
             className="w-full rounded border p-2"
           />
@@ -229,6 +235,7 @@ const CreateForm = () => {
             type="text"
             value={formData.address.city}
             onChange={handleChange}
+             disabled={loading}
             required
             className="w-full rounded border p-2"
           />
@@ -245,6 +252,7 @@ const CreateForm = () => {
             type="text"
             value={formData.address.street}
             onChange={handleChange}
+             disabled={loading}
             required
             className="w-full rounded border p-2"
           />
@@ -261,6 +269,7 @@ const CreateForm = () => {
             type="text"
             value={formData.address.zip_code}
             onChange={handleChange}
+             disabled={loading}
             required
             className="w-full rounded border p-2"
           />
@@ -280,6 +289,7 @@ const CreateForm = () => {
             type="text"
             value={formData.description}
             onChange={handleChange}
+             disabled={loading}
             required
             className="w-full rounded border p-2"
           />
@@ -297,6 +307,7 @@ const CreateForm = () => {
             type="text"
             value={formData.venue_type}
             onChange={handleChange}
+             disabled={loading}
             required
             className="w-full rounded border p-2"
           />
@@ -309,6 +320,7 @@ const CreateForm = () => {
             id="featured_venue"
             checked={formData.featured_venue}
             onChange={handleChange}
+             disabled={loading}
           />
           <label htmlFor="featured_venue" className="text-sm text-gray-700">
             Featured Venue
@@ -328,6 +340,7 @@ const CreateForm = () => {
               type="file"
               multiple
               onChange={handleChange}
+               disabled={loading}
               className="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4
                  file:rounded-full file:border-0
                  file:text-sm file:font-semibold
@@ -340,15 +353,18 @@ const CreateForm = () => {
           </div>
         </div>
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className={`md:col-span-2 w-full rounded-lg px-5 py-2.5 text-white ${
-            isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-blue-700"
-          }`}
-        >
-          {isSubmitting ? "Submitting..." : "Add"}
-        </button>
+              {loading ? (
+  <div className="md:col-span-2 w-full text-center py-2">
+    <span className="loader inline-block w-5 h-5 border-2 border-t-transparent border-white rounded-full animate-spin mr-2"></span>
+  </div>
+) : (
+  <button
+    type="submit"
+    className="md:col-span-2 w-full rounded-lg bg-blue-700 px-5 py-2.5 text-white"
+  >
+    Submit
+  </button>
+)}
       </form>
     </div>
   );

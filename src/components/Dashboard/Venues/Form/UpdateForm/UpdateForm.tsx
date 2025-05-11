@@ -1,85 +1,97 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import './style.css';
+import "./style.css";
 import { useRouter } from "next/navigation";
 import { fetchGetSingleVenueData } from "../../../../../../utils/dashboard";
 
 interface Venue {
-  description: string;
-  venueId: string;
-  email: string;
-  venue_name: string;
-  phone_no: string;
-  venue_location: string;
-  region_state: string;
-  featured_venue: boolean;
-  venue_status: string;
-  serial_no:string
-  gallery: string[]
-  user_role:string
-  venue_user:string
-  venue_type:string
-}
-
-interface PropsSlug{
-  slug:string
-}
-
-const UpdateForm: React.FC<PropsSlug> = ({ slug }) => {
- const [venue, setVenue] = useState<Venue | null>(null);
-
-const [formData, setFormData] = useState<{
   user_role: string;
-  venueId: string;
-  serial_no: string;
+
   venue_user: string;
   venue_name: string;
   phone_no: string;
   email: string;
-  venue_location: string;
-  region_state: string;
+  address: {
+    country: string;
+    state: string;
+    city: string;
+    street: string;
+    zip_code: string;
+  };
+
   featured_venue: boolean;
-  gallery: string[]; 
-  venue_status: string;
+  gallery: string[];
   description: string;
   venue_type: string;
-}>({
-  user_role: "admin",
-  venueId: "",
-  serial_no: "",
-  venue_user: "",
-  venue_name: "",
-  phone_no: "",
-  email: "",
-  venue_location: "",
-  region_state: "",
-  featured_venue: false,
-  gallery: [],
-  venue_status: "active",
-  description: "",
-  venue_type: "event",
-});
-  const router = useRouter();
+}
 
+interface PropsSlug {
+  slug: string;
+}
+
+const UpdateForm: React.FC<PropsSlug> = ({ slug }) => {
+  const [venue, setVenue] = useState<Venue | null>(null);
+
+  const [formData, setFormData] = useState<{
+    user_role: string;
+    venue_user: string;
+    venue_name: string;
+    phone_no: string;
+    email: string;
+    address: {
+      country: string;
+      state: string;
+      city: string;
+      street: string;
+      zip_code: string;
+    };
+    featured_venue: boolean;
+    gallery: string[];
+    description: string;
+    venue_type: string;
+  }>({
+    user_role: "admin",
+
+    venue_user: "",
+    venue_name: "",
+    phone_no: "",
+    email: "",
+    address: {
+      country: "",
+      state: "",
+      city: "",
+      street: "",
+      zip_code: "",
+    },
+
+    featured_venue: false,
+    gallery: [],
+
+    description: "",
+    venue_type: "event",
+  });
+  const router = useRouter();
+  const [loading,setLoading]=useState(false)
   const getSingleData = async () => {
     try {
       const fetchData = await fetchGetSingleVenueData(slug);
       const venueData = fetchData?.result;
       setVenue(venueData);
-      // Pre-fill the form with the fetched data
       setFormData({
-        user_role:"admin",
-        venueId: venueData?.venueId || "",
-        serial_no: venueData?.serial_no || "",
+        user_role: "admin",
         venue_user: venueData?.venue_user || "",
         venue_name: venueData?.venue_name || "",
         phone_no: venueData?.phone_no || "",
         email: venueData?.email || "",
-        venue_location: venueData?.venue_location || "",
-        region_state: venueData?.region_state || "",
+        address: {
+          country: venueData?.address?.country || "",
+          state: venueData?.address?.state || "",
+          city: venueData?.address?.city || "",
+          street: venueData?.address?.street || "",
+          zip_code: venueData?.address?.zip_code || "",
+        },
         featured_venue: venueData?.featured_venue || false,
         gallery: venueData?.gallery || [],
-        venue_status: venueData?.venue_status || "active",
         description: venueData?.description || "",
         venue_type: venueData?.venue_type || "event",
       });
@@ -94,25 +106,32 @@ const [formData, setFormData] = useState<{
     }
   }, [slug]);
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value, type, checked, files } = e.target;
 
-   if (id === "gallery") {
-  const fileList = (e.target as HTMLInputElement).files;
-  if (fileList) {
-    const fileNames = Array.from(fileList).map((file) => file.name);
-    setFormData((prev) => ({ ...prev, gallery: fileNames }));
-  }
+    if (id === "gallery") {
+      if (files) {
+        const fileNames = Array.from(files).map((file) => file.name);
+        setFormData((prev) => ({ ...prev, gallery: fileNames }));
+      }
     } else if (type === "checkbox") {
       setFormData((prev) => ({ ...prev, [id]: checked }));
+    } else if (
+      ["country", "state", "city", "street", "zip_code"].includes(id)
+    ) {
+      const key = id === "state" ? "state" : id;
+      setFormData((prev) => ({
+        ...prev,
+        address: { ...prev.address, [key]: value },
+      }));
     } else {
       setFormData((prev) => ({ ...prev, [id]: value }));
     }
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    setLoading(true)
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_URL}/api/venues/update?venue_id=${slug}`,
@@ -127,14 +146,15 @@ const [formData, setFormData] = useState<{
       console.log("Response:", data);
 
       if (res.ok) {
-  alert("Venue updated successfully!");
-  window.location.href = "/dashboard"; // Triggers a full page reload to /dashboard
-} else {
+        alert("Venue updated successfully!");
+        window.location.href = "/dashboard";
+      } else {
         alert("Error: " + data.error);
       }
     } catch (error) {
       console.error("Post error:", error);
       alert("Something went wrong");
+      setLoading(false)
     }
   };
 
@@ -147,40 +167,6 @@ const [formData, setFormData] = useState<{
       >
         <div>
           <label
-            htmlFor="venueId"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Venue ID
-          </label>
-          <input
-            id="venueId"
-            type="text"
-            value={formData.venueId}
-            onChange={handleChange}
-            required
-            className="w-full rounded border p-2"
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="serial_no"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Serial No
-          </label>
-          <input
-            id="serial_no"
-            type="text"
-            value={formData.serial_no}
-            onChange={handleChange}
-            required
-            className="w-full rounded border p-2"
-          />
-        </div>
-
-        <div>
-          <label
             htmlFor="venue_user"
             className="block text-sm font-medium text-gray-700"
           >
@@ -191,6 +177,7 @@ const [formData, setFormData] = useState<{
             type="text"
             value={formData.venue_user}
             onChange={handleChange}
+            disabled={loading}
             required
             className="w-full rounded border p-2"
           />
@@ -208,6 +195,7 @@ const [formData, setFormData] = useState<{
             type="text"
             value={formData.venue_name}
             onChange={handleChange}
+            disabled={loading}
             required
             className="w-full rounded border p-2"
           />
@@ -225,6 +213,7 @@ const [formData, setFormData] = useState<{
             type="text"
             value={formData.phone_no}
             onChange={handleChange}
+            disabled={loading}
             required
             className="w-full rounded border p-2"
           />
@@ -242,6 +231,7 @@ const [formData, setFormData] = useState<{
             type="email"
             value={formData.email}
             onChange={handleChange}
+            disabled={loading}
             required
             className="w-full rounded border p-2"
           />
@@ -249,33 +239,87 @@ const [formData, setFormData] = useState<{
 
         <div>
           <label
-            htmlFor="venue_location"
+            htmlFor="country"
             className="block text-sm font-medium text-gray-700"
           >
-            Venue Location
+            Venue country
           </label>
           <input
-            id="venue_location"
+            id="country"
             type="text"
-            value={formData.venue_location}
+            value={formData.address.country}
             onChange={handleChange}
+            disabled={loading}
             required
             className="w-full rounded border p-2"
           />
         </div>
 
-        <div>
+ <div>
           <label
-            htmlFor="region_state"
+            htmlFor="state"
             className="block text-sm font-medium text-gray-700"
           >
-            Region / State
+            Venue state
           </label>
           <input
-            id="region_state"
+            id="state"
             type="text"
-            value={formData.region_state}
+            value={formData.address.state}
             onChange={handleChange}
+            disabled={loading}
+            required
+            className="w-full rounded border p-2"
+          />
+        </div>
+         <div>
+          <label
+            htmlFor="city"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Venue city
+          </label>
+          <input
+            id="city"
+            type="text"
+            value={formData.address.city}
+            onChange={handleChange}
+            disabled={loading}
+            required
+            className="w-full rounded border p-2"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="street"
+            className="block text-sm font-medium text-gray-700"
+          >
+           Street
+          </label>
+          <input
+            id="street"
+            type="text"
+            value={formData.address.street}
+            onChange={handleChange}
+            disabled={loading}
+            required
+            className="w-full rounded border p-2"
+          />
+        </div>
+
+  <div>
+          <label
+            htmlFor="zip_code"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Venue zip_code
+          </label>
+          <input
+            id="zip_code"
+            type="text"
+            value={formData.address.zip_code}
+            onChange={handleChange}
+            disabled={loading}
             required
             className="w-full rounded border p-2"
           />
@@ -293,6 +337,7 @@ const [formData, setFormData] = useState<{
             type="text"
             value={formData.description}
             onChange={handleChange}
+            disabled={loading}
             required
             className="w-full rounded border p-2"
           />
@@ -310,23 +355,7 @@ const [formData, setFormData] = useState<{
             type="text"
             value={formData.venue_type}
             onChange={handleChange}
-            required
-            className="w-full rounded border p-2"
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="venue_status"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Venue Status
-          </label>
-          <input
-            id="venue_status"
-            type="text"
-            value={formData.venue_status}
-            onChange={handleChange}
+            disabled={loading}
             required
             className="w-full rounded border p-2"
           />
@@ -338,6 +367,7 @@ const [formData, setFormData] = useState<{
             id="featured_venue"
             checked={formData.featured_venue}
             onChange={handleChange}
+            disabled={loading}
           />
           <label htmlFor="featured_venue" className="text-sm text-gray-700">
             Featured Venue
@@ -345,57 +375,74 @@ const [formData, setFormData] = useState<{
         </div>
 
         <div className="space-y-2">
-  <label
-    htmlFor="gallery"
-    className="block text-sm font-semibold text-gray-800"
-  >
-    Upload Gallery Images
-  </label>
-  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 bg-gray-50 hover:border-blue-500 transition">
-    <input
-      id="gallery"
-      type="file"
-      multiple
-      onChange={handleChange}
-      className="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4
+          <label
+            htmlFor="gallery"
+            className="block text-sm font-semibold text-gray-800"
+          >
+            Upload Gallery Images
+          </label>
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 bg-gray-50 hover:border-blue-500 transition">
+            <input
+              id="gallery"
+              type="file"
+              multiple
+              onChange={handleChange}
+              disabled={loading}
+              className="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4
         file:rounded-full file:border-0
         file:text-sm file:font-semibold
         file:bg-blue-50 file:text-blue-700
         hover:file:bg-blue-100"
-    />
-    {venue?.gallery && venue?.gallery.length > 0 && (
-      <div className="mt-3">
-        <h4 className="font-semibold text-sm">Current Gallery Images:</h4>
-        <div className="grid grid-cols-3 gap-2 mt-2">
-     {(venue?.gallery ?? []).length > 0 && (
-  <div className="mt-3">
-    <h4 className="font-semibold text-sm">Current Gallery Images:</h4>
-    <div className="grid grid-cols-3 gap-2 mt-2">
-      {venue.gallery.map((image, index) => (
-        <div key={index} className="w-24 h-24 bg-gray-200 flex items-center justify-center">
-          <img src={image} alt={`Gallery image ${index + 1}`} className="w-full h-full object-cover rounded" />
+            />
+            {venue?.gallery && venue?.gallery.length > 0 && (
+              <div className="mt-3">
+                <h4 className="font-semibold text-sm">
+                  Current Gallery Images:
+                </h4>
+                <div className="grid grid-cols-3 gap-2 mt-2">
+                  {(venue?.gallery ?? []).length > 0 && (
+                    <div className="mt-3">
+                      <h4 className="font-semibold text-sm">
+                        Current Gallery Images:
+                      </h4>
+                      <div className="grid grid-cols-3 gap-2 mt-2">
+                        {venue.gallery.map((image, index) => (
+                          <div
+                            key={index}
+                            className="w-24 h-24 bg-gray-200 flex items-center justify-center"
+                          >
+                            <img
+                              src={image}
+                              alt={`Gallery image ${index + 1}`}
+                              className="w-full h-full object-cover rounded"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            <p className="mt-2 text-xs text-gray-500">
+              Choose multiple images (JPG, PNG, etc.)
+            </p>
+          </div>
         </div>
-      ))}
-    </div>
+
+        {loading ? (
+  <div className="md:col-span-2 w-full text-center py-2">
+    <span className="loader inline-block w-5 h-5 border-2 border-t-transparent border-white rounded-full animate-spin mr-2"></span>
   </div>
+) : (
+  <button
+    type="submit"
+    className="md:col-span-2 w-full rounded-lg bg-blue-700 px-5 py-2.5 text-white"
+  >
+    Submit
+  </button>
 )}
 
-        </div>
-      </div>
-    )}
-    <p className="mt-2 text-xs text-gray-500">
-      Choose multiple images (JPG, PNG, etc.)
-    </p>
-  </div>
-</div>
-
-
-        <button
-          type="submit"
-          className="md:col-span-2 w-full rounded-lg bg-blue-700 px-5 py-2.5 text-white"
-        >
-          Submit
-        </button>
       </form>
     </div>
   );

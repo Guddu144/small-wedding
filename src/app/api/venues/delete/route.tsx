@@ -4,6 +4,7 @@ export const dynamic = "force-dynamic";
 
 export async function DELETE(request: Request) {
       const { venue_id, user_role } = await request.json();
+      console.log( venue_id, user_role)
   try {
 
 
@@ -15,23 +16,19 @@ export async function DELETE(request: Request) {
     }
 
     // Optional: Authorization logic
-    if (user_role !== "admin" && user_role !== "venueowner") {
+    if (user_role !== "admin" && user_role !== "venueowner" && user_role !== "superadmin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_VENUE_URL}/venues/${venue_id}`,
       {
-        method: "DELETE",
-
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user_role: user_role,
-        }),
-      }
-    );
+  method: 'DELETE',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({    user_role: "superadmin" }),
+});
 
     if (!response.ok) {
       throw new Error(`Failed to delete venue data: ${response.statusText}`);
