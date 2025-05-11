@@ -2,8 +2,12 @@
 import React, { useState } from "react";
 import "./style.css";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
-const CreateForm = () => {
+interface UserProps {
+  userEmail: string;
+}
+const CreateForm:React.FC<UserProps> = ({userEmail}) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -30,10 +34,10 @@ const CreateForm = () => {
   }>({
     user_role: "admin",
 
-    venue_user: "",
+    venue_user: userEmail,
     venue_name: "",
     phone_no: "",
-    email: "",
+    email: userEmail,
     address: {
       country: "",
       state: "",
@@ -78,7 +82,7 @@ const CreateForm = () => {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    if (loading) return; // Prevent duplicate submission
+   
     setLoading(true);
     try {
       const res = await fetch(
@@ -93,9 +97,10 @@ const CreateForm = () => {
       const data = await res.json();
       console.log("Response:", data);
 
-      if (res.ok) {
-        alert("Venue added successfully!");
-        router.push("/dashboard");
+     if (res.ok) {
+
+        toast.success("Venue created successfully!");
+       router.push('/dashboard')
       } else {
         alert("Error: " + data.error);
       }
@@ -108,6 +113,12 @@ const CreateForm = () => {
   };
 
   return (
+  <>
+        {loading ? 
+        <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
+          <div className="loader"></div>
+        </div> :
+   
     <div className="DialogContent2 ">
       <h1 className="text-center text-2xl pt-4 pb-8 font-semibold">
         Create a New Item
@@ -128,10 +139,10 @@ const CreateForm = () => {
             id="venue_user"
             type="text"
             value={formData.venue_user}
-            onChange={handleChange}
-             disabled={loading}
+          
+             disabled
             required
-            className="w-full rounded border p-2"
+            className="w-full rounded border p-2 bg-[#f5f5f5]"
           />
         </div>
 
@@ -147,7 +158,7 @@ const CreateForm = () => {
             type="text"
             value={formData.venue_name}
             onChange={handleChange}
-             disabled={loading}
+             
             required
             className="w-full rounded border p-2"
           />
@@ -165,7 +176,7 @@ const CreateForm = () => {
             type="text"
             value={formData.phone_no}
             onChange={handleChange}
-             disabled={loading}
+             
             required
             className="w-full rounded border p-2"
           />
@@ -182,10 +193,9 @@ const CreateForm = () => {
             id="email"
             type="email"
             value={formData.email}
-            onChange={handleChange}
-             disabled={loading}
+            disabled
             required
-            className="w-full rounded border p-2"
+            className="w-full rounded border p-2 bg-[#f5f5f5]"
           />
         </div>
 
@@ -201,7 +211,7 @@ const CreateForm = () => {
             type="text"
             value={formData.address.country}
             onChange={handleChange}
-             disabled={loading}
+             
             required
             className="w-full rounded border p-2"
           />
@@ -218,7 +228,7 @@ const CreateForm = () => {
             type="text"
             value={formData.address.state}
             onChange={handleChange}
-             disabled={loading}
+             
             required
             className="w-full rounded border p-2"
           />
@@ -235,7 +245,7 @@ const CreateForm = () => {
             type="text"
             value={formData.address.city}
             onChange={handleChange}
-             disabled={loading}
+             
             required
             className="w-full rounded border p-2"
           />
@@ -252,7 +262,7 @@ const CreateForm = () => {
             type="text"
             value={formData.address.street}
             onChange={handleChange}
-             disabled={loading}
+             
             required
             className="w-full rounded border p-2"
           />
@@ -269,7 +279,7 @@ const CreateForm = () => {
             type="text"
             value={formData.address.zip_code}
             onChange={handleChange}
-             disabled={loading}
+             
             required
             className="w-full rounded border p-2"
           />
@@ -289,7 +299,7 @@ const CreateForm = () => {
             type="text"
             value={formData.description}
             onChange={handleChange}
-             disabled={loading}
+             
             required
             className="w-full rounded border p-2"
           />
@@ -307,7 +317,7 @@ const CreateForm = () => {
             type="text"
             value={formData.venue_type}
             onChange={handleChange}
-             disabled={loading}
+             
             required
             className="w-full rounded border p-2"
           />
@@ -320,7 +330,7 @@ const CreateForm = () => {
             id="featured_venue"
             checked={formData.featured_venue}
             onChange={handleChange}
-             disabled={loading}
+             
           />
           <label htmlFor="featured_venue" className="text-sm text-gray-700">
             Featured Venue
@@ -340,7 +350,7 @@ const CreateForm = () => {
               type="file"
               multiple
               onChange={handleChange}
-               disabled={loading}
+               
               className="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4
                  file:rounded-full file:border-0
                  file:text-sm file:font-semibold
@@ -353,20 +363,18 @@ const CreateForm = () => {
           </div>
         </div>
 
-              {loading ? (
-  <div className="md:col-span-2 w-full text-center py-2">
-    <span className="loader inline-block w-5 h-5 border-2 border-t-transparent border-white rounded-full animate-spin mr-2"></span>
-  </div>
-) : (
+
   <button
     type="submit"
     className="md:col-span-2 w-full rounded-lg bg-blue-700 px-5 py-2.5 text-white"
   >
     Submit
   </button>
-)}
+
       </form>
-    </div>
+    </div>}
+     </>
+
   );
 };
 

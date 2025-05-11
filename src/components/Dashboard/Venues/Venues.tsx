@@ -8,27 +8,28 @@ import { Charts2 } from "./Charts/Charts2";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import DropdownMenu from "./Dropdown/Dropdown";
+import toast from "react-hot-toast";
 
 interface Venue {
   user_role: string;
-    venueId:string;
-    venue_user: string;
-    venue_name: string;
-    phone_no: string;
-    email: string;
-    address: {
-      country: string;
-      state: string;
-      city: string;
-      street: string;
-      zip_code: string;
-    };
-    region_state: string;
-    featured_venue: boolean;
-    gallery: string[];
+  venueId: string;
+  venue_user: string;
+  venue_name: string;
+  phone_no: string;
+  email: string;
+  address: {
+    country: string;
+    state: string;
+    city: string;
+    street: string;
+    zip_code: string;
+  };
+  region_state: string;
+  featured_venue: boolean;
+  gallery: string[];
 
-    description: string;
-    venue_type: string;
+  description: string;
+  venue_type: string;
   created_date: string;
 }
 
@@ -45,7 +46,8 @@ const Venues: React.FC<UserProps> = ({ userRole }) => {
       console.log(fetchData.result.venues);
       const sortedVenues = fetchData.result.venues.sort(
         (a: Venue, b: Venue) =>
-          new Date(b.created_date).getTime() - new Date(a.created_date).getTime()
+          new Date(b.created_date).getTime() -
+          new Date(a.created_date).getTime()
       );
       setVenues(sortedVenues);
     } catch (error) {
@@ -60,32 +62,38 @@ const Venues: React.FC<UserProps> = ({ userRole }) => {
   }, []);
 
   const deleteVenue = async (venue_id: string) => {
+    setLoading(true);
     try {
-      const res = await fetch( `${process.env.NEXT_PUBLIC_URL}/api/venues/delete?venue_id=${venue_id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          venue_id:venue_id,
-          user_role: userRole,
-        }),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/venues/delete?venue_id=${venue_id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            venue_id: venue_id,
+            user_role: userRole,
+          }),
+        }
+      );
 
-      if (!res.ok) {
-        throw new Error(`Failed to delete venue,${userRole + venue_id}` );
+      if (res.ok) {
+        toast.success("Venue Delete Successfully!");
       }
 
-      router.push('/dashboard'); 
+      router.push("/dashboard");
     } catch (error) {
       console.error("Delete error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDelete = async (venue_id: string) => {
     if (confirm("Are you sure you want to delete this venue?")) {
       await deleteVenue(venue_id);
-     await fetchNewData();
+      await fetchNewData();
     }
   };
   return (
@@ -145,7 +153,9 @@ const Venues: React.FC<UserProps> = ({ userRole }) => {
                 <th className="px-6 py-3">VenueId</th>
                 <th className="px-6 py-3">Email</th>
                 <th className="px-6 py-3">Location</th>
-                {userRole == "admin" || userRole == "venueowner" || userRole == "superadmin" ? (
+                {userRole == "admin" ||
+                userRole == "venueowner" ||
+                userRole == "superadmin" ? (
                   <th className="px-6 py-3">Action</th>
                 ) : (
                   ""
@@ -156,7 +166,9 @@ const Venues: React.FC<UserProps> = ({ userRole }) => {
               {loading ? (
                 <tr>
                   <td colSpan={6} className="text-center py-4">
-                    Loading...
+                    <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
+                      <div className="loader"></div>
+                    </div>
                   </td>
                 </tr>
               ) : venues.length > 0 ? (
@@ -177,9 +189,10 @@ const Venues: React.FC<UserProps> = ({ userRole }) => {
                         <img
                           className="w-20 h-20 mt-2 object-cover"
                           src={
-                            item?.gallery[0] ?
-                            "https://www.theestateyountville.com/wp-content/uploads/2023/09/The-Estate-Yountville-Partner-Assets-DJI_0045-1_R-820x460.jpg"
-                          :"No Image"}
+                            item?.gallery[0]
+                              ? "https://www.theestateyountville.com/wp-content/uploads/2023/09/The-Estate-Yountville-Partner-Assets-DJI_0045-1_R-820x460.jpg"
+                              : "No Image"
+                          }
                           alt="venue"
                         />
                       )}

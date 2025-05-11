@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-
+import toast, { Toaster } from "react-hot-toast";
 const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname=usePathname()
@@ -117,6 +117,19 @@ const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
          {children}
          </div> {/* Render children here, outside of the sidebar */}
       </main>
+      <Toaster
+          position="bottom-right"
+          toastOptions={{
+            style: {
+              fontSize: "16px",
+              fontWeight: "600",
+              background: "#fff",
+              zIndex:"99999999"
+            },
+             duration:5000,
+               removeDelay: 5000,
+          }}
+        />
     </>
   );
 };
