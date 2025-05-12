@@ -1,6 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { fetchGetVenueData } from "../../../../utils/dashboard";
+import {
+  fetchGetVenueData,
+  fetchGetWishlist,
+} from "../../../../utils/dashboard";
 import SearchBox from "./Search/Search";
 import PopupContent from "./Popup/PopupContent";
 import { Charts } from "./Charts/Charts";
@@ -36,6 +39,7 @@ interface Venue {
 
 interface UserProps {
   userRole: string;
+
 }
 const Venues: React.FC<UserProps> = ({ userRole }) => {
   const [venues, setVenues] = useState<Venue[]>([]);
@@ -71,7 +75,7 @@ const Venues: React.FC<UserProps> = ({ userRole }) => {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-          },
+          }, next:{revalidate:0},
           body: JSON.stringify({
             venue_id: venue_id,
             user_role: userRole,
@@ -106,37 +110,10 @@ const Venues: React.FC<UserProps> = ({ userRole }) => {
     return name.includes(term) || country.includes(term);
   });
 
+ 
+
   const handleWishList = () => {
     router.push("/dashboard/venues/wishlist");
-  };
-
-  const [venueStatus, setVenueStatus] = useState(false);
-  const handleVeneueStatus = async (venueId:string) => {
-    setLoading(true);
-    console.log("Response:", venueId);
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/venues/acceptvenue/post`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            venueId: venueId,
-            user_role: "superadmin",
-          }),
-        }
-      );
-      if(res.ok){
-        setVenueStatus(true)
-        toast.success("Added to Wishlist")
-      }
-      const data = await res.json();
-      console.log("Response:", data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
@@ -236,7 +213,7 @@ const Venues: React.FC<UserProps> = ({ userRole }) => {
                           className="w-20 h-20 mt-2 object-cover"
                           src={
                             item?.gallery[0]
-                              ? "https://www.theestateyountville.com/wp-content/uploads/2023/09/The-Estate-Yountville-Partner-Assets-DJI_0045-1_R-820x460.jpg"
+                              ? "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsXF_gMShHtqkl8umbb0Nyj9opn9GbxiVKJhKl1LGTbWGmewaVVEdNJPTRwquyQILbAp4&usqp=CAU"
                               : "No Image"
                           }
                           alt="venue"
@@ -245,7 +222,6 @@ const Venues: React.FC<UserProps> = ({ userRole }) => {
                     </td>
                     <td className="px-6 py-4">{item?.email}</td>
                     <td className="px-6 py-4">{item?.address.country}</td>
-                 
 
                     {userRole == "superadmin" ||
                     userRole == "admin" ||

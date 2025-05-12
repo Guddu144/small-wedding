@@ -59,3 +59,21 @@ export const fetchGetSuperadminVenueData = async (page = 1, limit = 9) => {
       console.error("Failed to fetch data:", error);
     }
   };
+
+
+    export const fetchGetWishlist = async (userId:string) => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/venues/wishlist/get?userId=${userId}`,{
+        headers: {
+          'Content-Type': 'application/json'
+        }, next:{revalidate:0}
+      });
+      const data = await res.json();
+      console.log(data);
+      return data;
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+    }
+  };
+
+
