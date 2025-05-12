@@ -4,7 +4,7 @@ import { Dialog } from "radix-ui";
 import "./style.css";
 
 import { RxCross2 } from "react-icons/rx";
-import { BiCurrentLocation } from "react-icons/bi";
+
 
 
 interface PopupContentProps {

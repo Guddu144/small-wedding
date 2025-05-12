@@ -4,8 +4,6 @@ import React, { useEffect, useState } from "react";
 import TableInfo from "../Table/TableInfo";
 import Link from "next/link";
 import DropdownMenu from "../Dropdown/Dropdown";
-import PopupContent from "../Popup/PopupContent";
-import CreateForm from "../Form/CreateForm/CreateForm";
 
 interface Venue {
   description: string;
@@ -53,7 +51,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
       <div className="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-3 md:space-y-0 pb-2 bg-white ">
         <div className="inline-flex items-center gap-2">
           <DropdownMenu />
-          <PopupContent />
+          {/* <PopupContent /> */}
         </div>
         <div className=" bg-white flex justify-end items-center">
           <Link
