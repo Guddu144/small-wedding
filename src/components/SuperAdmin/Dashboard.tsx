@@ -98,12 +98,12 @@ const VenuesSuperadmin: React.FC<UserProps> = ({ userRole }) => {
   };
 
   const [searchTerm, setSearchTerm] = useState("");
-  const filteredVenues = venues.filter((venue) => {
-    const name = venue.venue_name.toLowerCase();
-    const country = venue.address.country.toLowerCase();
-    const term = searchTerm.toLowerCase();
-    return name.includes(term) || country.includes(term);
-  });
+  // const filteredVenues = venues.filter((venue) => {
+  //   const name = venue.venue_name.toLowerCase();
+  //   const country = venue.address.country.toLowerCase();
+  //   const term = searchTerm.toLowerCase();
+  //   return name.includes(term) || country.includes(term);
+  // });
 
   const handleWishList = () => {
     router.push("/dashboard/venues/wishlist");
@@ -238,8 +238,8 @@ const VenuesSuperadmin: React.FC<UserProps> = ({ userRole }) => {
                     </div>
                   </td>
                 </tr>
-              ) : filteredVenues.length > 0 ? (
-                filteredVenues.map((item, index) => (
+              ) : venues.length > 0 ? (
+                venues.map((item, index) => (
                   <tr
                     key={index}
                     className="bg-white border-b hover:bg-gray-50"
@@ -257,7 +257,7 @@ const VenuesSuperadmin: React.FC<UserProps> = ({ userRole }) => {
                           className="w-20 h-20 mt-2 object-cover"
                           src={
                             item?.gallery[0]
-                              ? "https://www.theestateyountville.com/wp-content/uploads/2023/09/The-Estate-Yountville-Partner-Assets-DJI_0045-1_R-820x460.jpg"
+                              ? item?.gallery[0]
                               : "No Image"
                           }
                           alt="venue"
