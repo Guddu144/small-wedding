@@ -130,7 +130,7 @@ if (formData.gallery.length > 0) {
       console.error("Post error:", error);
       alert("Something went wrong");
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 

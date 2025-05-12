@@ -117,7 +117,7 @@ const Sidebar: React.FC<SidebarProps> = ({ children, userRole }) => {
                 <span className="ms-3">Dashboard</span>
               </Link>
             </li>
-              {(userRole === 'superadmin' || userRole === 'admin') && (
+              {/* {(userRole === 'superadmin' || userRole === 'admin') && (
             <li>
               <Link href="/dashboard/users" className={`${pathname === '/dashboard/users' ? "bg-gray-200" : ""} flex items-center p-2 rounded-lg text-gray-900 hover:bg-gray-100 group`}>
                 <svg className="w-5 h-5 text-gray-500 group-hover:text-gray-900" fill="currentColor" viewBox="0 0 20 18">
@@ -126,7 +126,7 @@ const Sidebar: React.FC<SidebarProps> = ({ children, userRole }) => {
                 <span className="ms-3">Users</span>
               </Link>
             </li>
-              )}
+              )} */}
             {(userRole === 'superadmin' || userRole === 'admin') && (
               <li>
             <Link href="/dashboard/venue/superadmin" className={`${pathname==='/dashboard/venue/superadmin' ? "bg-gray-200":""} flex items-center p-2 rounded-lg text-gray-900  hover:bg-gray-100 group`}>
