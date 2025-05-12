@@ -15,7 +15,7 @@ AWS.config.update({
 const s3 = new AWS.S3();
 import { Buffer } from 'buffer';
 
-export async function uploadFilesToS3(files:any) {
+export async function uploadFilesToS3(files: File[]) {
   const bucketName = 'venue-image-bucket';
   const uploadedFiles = [];
 

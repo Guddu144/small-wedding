@@ -53,7 +53,7 @@ export default function Navbar() {
             OUR STORY
           </Link>
           <Link
-            href="#services"
+            href="/services"
             className="hover:text-gold-400 transition-colors"
             tabIndex={0}
             aria-label="Services"
@@ -61,7 +61,7 @@ export default function Navbar() {
             SERVICES
           </Link>
           <Link
-            href="/dashboard"
+            href="/venues"
             className="hover:text-gold-400 transition-colors"
             tabIndex={0}
             aria-label="Venues"
