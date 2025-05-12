@@ -1,31 +1,96 @@
+"use client"
 import FooterSection from "@/components/Index/FooterSection";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useDebounce } from "use-debounce";
+import { fetchGetVenueData } from "../../../utils/dashboard";
 
 
-const venues = [
-  {
-    name: 'Vineyard Deck',
-    image: '/images/venues/image-1.jpg',
-    area: '3,789 sq ft',
-    guests: 350,
-    description: 'Exchange vows or entertain guests while enjoying stellar valley views from this alluring outdoor wedding.',
-  },
-  {
-    name: 'Village Lawn',
-    image: '/images/venues/image-2.jpg',
-    area: '3,789 sq ft',
-    guests: 170,
-    description: 'Adjacent to the Meritage Ballroom, the terrace is perfect for outdoor ceremonies and cocktail.',
-  },
-  {
-    name: 'Fountain Courtyard',
-    image: '/images/venues/image-3.jpg',
-    area: '2,485 sq ft',
-    guests: 295,
-    description: 'Located off the spacious Carneros Ballroom, the covered Oakville Terrace can accommodate',
-  },
-];
+// const venues = [
+//   {
+//     name: 'Vineyard Deck',
+//     image: '/images/venues/image-1.jpg',
+//     area: '3,789 sq ft',
+//     guests: 350,
+//     description: 'Exchange vows or entertain guests while enjoying stellar valley views from this alluring outdoor wedding.',
+//   },
+//   {
+//     name: 'Village Lawn',
+//     image: '/images/venues/image-2.jpg',
+//     area: '3,789 sq ft',
+//     guests: 170,
+//     description: 'Adjacent to the Meritage Ballroom, the terrace is perfect for outdoor ceremonies and cocktail.',
+//   },
+//   {
+//     name: 'Fountain Courtyard',
+//     image: '/images/venues/image-3.jpg',
+//     area: '2,485 sq ft',
+//     guests: 295,
+//     description: 'Located off the spacious Carneros Ballroom, the covered Oakville Terrace can accommodate',
+//   },
+// ];
+
+interface Venue {
+  user_role: string;
+  venueId: string;
+  venue_user: string;
+  venue_name: string;
+  phone_no: string;
+  email: string;
+  address: {
+    country: string;
+    state: string;
+    city: string;
+    street: string;
+    zip_code: string;
+  };
+  region_state: string;
+  featured_venue: boolean;
+  gallery: string[];
+  description: string;
+  venue_type: string;
+  created_date: string;
+}
 
 export default function VenuesPage() {
+    const [venues, setVenues] = useState<Venue[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
+
+  
+    const fetchNewData = async () => {
+      setLoading(true);
+      try {
+        const fetchData = await fetchGetVenueData();
+        const sortedVenues = fetchData.result.venues.sort(
+          (a: Venue, b: Venue) =>
+            new Date(b.created_date).getTime() -
+            new Date(a.created_date).getTime()
+        );
+        setVenues(sortedVenues);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    useEffect(() => {
+      fetchNewData();
+    }, []);
+
+      const filteredVenues = venues.filter((venue) => {
+    const term = debouncedSearchTerm.toLowerCase();
+    return (
+      venue.venue_name.toLowerCase().includes(term) ||
+      venue.address.country.toLowerCase().includes(term) ||
+      venue.address.city.toLowerCase().includes(term) ||
+      venue.address.state.toLowerCase().includes(term)
+    
+    );
+  });
+
   return (
     <main className="min-h-screen bg-[#f5f3ef]">
       {/* <Navbar /> */}
@@ -62,40 +127,43 @@ export default function VenuesPage() {
                 placeholder="Search Location, Venue Name"
                 className="bg-transparent outline-none border-none text-navy-900 placeholder:text-navy-900 font-serif text-base w-full"
                 aria-label="Search venues"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             <button type="submit" className="px-8 py-3 bg-gradient-to-b from-[#957748] to-[#ac8b57] rounded-[10px] text-white font-serif text-base font-semibold uppercase tracking-tight shadow hover:brightness-110 transition-colors">SEARCH</button>
           </form>
         </div>
         {/* Venues Grid */}
+ {loading? <p>Loading...</p>:
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {venues.concat(venues).map((venue, idx) => (
-            <div key={venue.name + idx} className="bg-white rounded-2xl border border-[#eae5da] shadow p-4 flex flex-col items-start">
+          {filteredVenues.map((item, idx) => (
+            <div key={idx} className="bg-white rounded-2xl border border-[#eae5da] shadow p-4 flex flex-col items-start">
               <div className="w-full h-56 relative mb-4">
                 <img
-                  src={venue.image}
-                  alt={venue.name}
+                  src={item?.gallery[0]}
+                  alt={item?.venue_name}
                   className="object-cover rounded-xl w-full h-full"
                 />
               </div>
-              <h3 className="text-xl font-serif font-bold text-navy-900 mb-2">{venue.name}</h3>
+              <h3 className="text-xl font-serif font-bold text-navy-900 mb-2">{item?.venue_name}</h3>
               <div className="flex items-center gap-6 mb-2">
                 <div className="flex items-center gap-1 text-navy-900 text-base">
                   <svg className="w-5 h-5 text-[#a89578]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
-                  {venue.area}
+                  {item?.address?.city}
                 </div>
                 <div className="flex items-center gap-1 text-navy-900 text-base">
                   <svg className="w-5 h-5 text-[#a89578]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a7.5 7.5 0 0 1 13 0"/></svg>
-                  {venue.guests} guests
+                  {item?.phone_no} 
                 </div>
               </div>
-              <p className="text-navy-900 text-base font-serif mb-6">{venue.description}</p>
+              <p className="text-navy-900 text-base font-serif mb-6">{item?.description}</p>
               <button className="w-full px-6 py-4 bg-[#0c3e58] rounded-[10px] inline-flex justify-center items-center gap-2.5">
                 <div className="text-center text-[#f2cc91] text-base font-medium font-['Lora'] uppercase leading-none">VIEW MORE</div>
               </button>
             </div>
           ))}
-        </div>
+        </div>}
       </section>
       <FooterSection />
     </main>

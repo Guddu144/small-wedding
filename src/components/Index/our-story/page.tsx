@@ -1,12 +1,11 @@
-import Image from 'next/image';
-import Navbar from '../Navbar';
+
 
 
 export default function OurStoryPage() {
   return (
     <main className="min-h-screen bg-white">
       {/* Navigation Bar */}
-      <Navbar />
+     
       {/* Hero Section */}
       <section className="relative h-[380px] md:h-[420px] flex items-center justify-center text-center overflow-hidden">
         {/* Video Background */}

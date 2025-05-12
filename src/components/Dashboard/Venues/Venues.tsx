@@ -151,13 +151,13 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
         <div className=" bg-white flex justify-end items-center">
                  {userRole == "superadmin" ||
                     userRole == "admin" ||
-                    userRole == "venueowner"  &&
+                    userRole == "venueowner"  ?
           <Link
             href="/dashboard/create"
             className="text-xl font-bold bg-gray-200 mr-3 hover:bg-gray-400 rounded-[6px] w-8 h-8 flex items-center justify-center transition"
           >
             +
-          </Link>}
+          </Link> : ''}
           <label htmlFor="table-search" className="sr-only">
             Search
           </label>
