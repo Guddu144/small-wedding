@@ -154,6 +154,12 @@ const handleVeneueStatus = async (venueId: string) => {
   }
 };
 
+  const handleVeneueStatusSubmit = async (venueId: string) => {
+    if (confirm("Are you sure you want to active this venue?")) {
+      await handleVeneueStatus(venueId);
+
+    }
+  };
 
   return (
     <div>
@@ -265,14 +271,14 @@ const handleVeneueStatus = async (venueId: string) => {
   <button aria-label="Verified"
     onClick={() => {
       if (item.venue_status !== "active") {
-        handleVeneueStatus(item.venueId);
+        handleVeneueStatusSubmit(item.venueId);
       }
     }}
     disabled={item.venue_status === "active"}
     className={` flex justify-center items-center mx-auto ${
       item.venue_status === "active"
         ? "text-green-600 cursor-not-allowed text-[20px]"
-        : "bg-green-600 hover:bg-green-700 px-4 py-1 rounded text-white"
+        : "bg-green-600 hover:bg-green-700 cursor-pointer px-4 py-1 rounded text-white"
     }`}
   >
     {item.venue_status === "active" ? <FaCircleCheck /> : "Accept"}
