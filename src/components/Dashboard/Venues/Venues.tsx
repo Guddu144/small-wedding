@@ -242,7 +242,7 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
                           className="w-20 h-20 mt-2 object-cover"
                           src={
                             item?.gallery[0]
-                              ? "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsXF_gMShHtqkl8umbb0Nyj9opn9GbxiVKJhKl1LGTbWGmewaVVEdNJPTRwquyQILbAp4&usqp=CAU"
+                              ?item?.gallery[0]
                               : "No Image"
                           }
                           alt="venue"

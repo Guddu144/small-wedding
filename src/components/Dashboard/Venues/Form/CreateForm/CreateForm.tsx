@@ -83,12 +83,35 @@ const CreateForm: React.FC<UserProps> = ({ userEmail }) => {
 
     setLoading(true);
     try {
+      // Prepare form data for submission
+      const formDataToSubmit = new FormData();
+      formDataToSubmit.append("venue_user", formData.venue_user);
+      formDataToSubmit.append("venue_name", formData.venue_name);
+      formDataToSubmit.append("phone_no", formData.phone_no);
+      formDataToSubmit.append("email", formData.email);
+      formDataToSubmit.append("country", formData.address.country);
+      formDataToSubmit.append("state", formData.address.state);
+      formDataToSubmit.append("city", formData.address.city);
+      formDataToSubmit.append("street", formData.address.street);
+      formDataToSubmit.append("zip_code", formData.address.zip_code);
+      formDataToSubmit.append("description", formData.description);
+      formDataToSubmit.append("venue_type", formData.venue_type);
+
+      // Append gallery images to form data
+      if (formData.gallery.length > 0) {
+        formData.gallery.forEach((fileName, index) => {
+          const file = document.getElementById("gallery")?.files?.[index];
+          if (file) {
+            formDataToSubmit.append("gallery", file);
+          }
+        });
+      }
+
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_URL}/api/venues/post`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+          body: formDataToSubmit,
         }
       );
 
@@ -337,6 +360,5 @@ const CreateForm: React.FC<UserProps> = ({ userEmail }) => {
       )}
     </>
   );
-};
-
+}
 export default CreateForm;
