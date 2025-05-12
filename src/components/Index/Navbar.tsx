@@ -43,7 +43,7 @@ export default function Navbar() {
         </div>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8">
+        <nav className="hidden lg:flex items-center space-x-8">
           <Link
             href="/our-story"
             className="hover:text-gold-400 transition-colors"
@@ -117,7 +117,7 @@ export default function Navbar() {
 
         {/* Mobile Menu Button */}
         <div
-          className="md:hidden"
+          className="lg:hidden"
           onClick={handleMenuToggle}
           onKeyDown={handleKeyDown}
           tabIndex={0}
@@ -144,7 +144,7 @@ export default function Navbar() {
 
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <nav className="md:hidden mt-4 flex flex-col space-y-4 px-6 bg-navy-950/80 backdrop-blur-sm rounded-lg p-4">
+        <nav className="lg:hidden mt-4 flex flex-col space-y-4 px-6 bg-navy-950/80 backdrop-blur-sm rounded-lg p-4">
           <Link
             href="/our-story"
             className="hover:text-gold-400 transition-colors py-2"
