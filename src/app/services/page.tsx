@@ -1,4 +1,5 @@
 import FooterSection from "@/components/Index/FooterSection";
+import Link from "next/link";
 
 
 const services = [
@@ -86,14 +87,14 @@ export default function ServicesPage() {
                   <img src={service.image} alt={service.title} className="h-80 object-contain" />
                 </div>
                 <div className="flex-1 flex flex-col justify-center w-full md:w-1/2">
-                  <a href="#book" className="absolute top-6 right-6 text-[#b5853b] text-sm font-serif font-semibold hover:underline md:static md:self-end md:mb-2">BOOK NOW</a>
+                  <Link href="#book" className="absolute top-6 right-6 text-[#b5853b] text-sm font-serif font-semibold hover:underline md:static md:self-end md:mb-2">BOOK NOW</Link>
                   <h3 className="text-lg md:text-xl font-serif font-bold text-navy-900 mb-2 mt-8 md:mt-0">{service.title}</h3>
                   <p className="text-navy-900 text-base font-serif">{service.description}</p>
                 </div>
               </div>
             ) : (
               <div key={service.title} className="bg-white rounded-2xl shadow p-6 flex flex-col relative min-h-[320px]">
-                <a href="#book" className="absolute top-6 right-6 text-[#b5853b] text-sm font-serif font-semibold hover:underline">BOOK NOW</a>
+                <Link href="#book" className="absolute top-6 right-6 text-[#b5853b] text-sm font-serif font-semibold hover:underline">BOOK NOW</Link>
                 <div className="w-full flex justify-center mb-4">
                   <img src={service.image} alt={service.title} className="h-56 object-contain" />
                 </div>
