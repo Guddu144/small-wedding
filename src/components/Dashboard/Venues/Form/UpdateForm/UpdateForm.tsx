@@ -20,7 +20,7 @@ interface Venue {
     zip_code: string;
   };
 
-  featured_venue: boolean;
+
   gallery: string[];
   description: string;
   venue_type: string;
@@ -46,7 +46,7 @@ const UpdateForm: React.FC<PropsSlug> = ({ slug }) => {
       street: string;
       zip_code: string;
     };
-    featured_venue: boolean;
+
     gallery: string[];
     description: string;
     venue_type: string;
@@ -65,7 +65,7 @@ const UpdateForm: React.FC<PropsSlug> = ({ slug }) => {
       zip_code: "",
     },
 
-    featured_venue: false,
+
     gallery: [],
 
     description: "",
@@ -92,7 +92,7 @@ const UpdateForm: React.FC<PropsSlug> = ({ slug }) => {
           street: venueData?.address?.street || "",
           zip_code: venueData?.address?.zip_code || "",
         },
-        featured_venue: venueData?.featured_venue || false,
+   
         gallery: venueData?.gallery || [],
         description: venueData?.description || "",
         venue_type: venueData?.venue_type || "event",
@@ -178,7 +178,7 @@ const UpdateForm: React.FC<PropsSlug> = ({ slug }) => {
             onSubmit={handleSubmit}
             className="grid md:grid-cols-2 gap-3 w-full max-w-2xl mx-auto space-y-4"
           >
-            <div>
+            <div className="hidden">
               <label
                 htmlFor="venue_user"
                 className="block text-sm font-medium text-gray-700"
@@ -374,18 +374,7 @@ const UpdateForm: React.FC<PropsSlug> = ({ slug }) => {
               />
             </div>
 
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="featured_venue"
-                checked={formData.featured_venue}
-                onChange={handleChange}
-                disabled={loading}
-              />
-              <label htmlFor="featured_venue" className="text-sm text-gray-700">
-                Featured Venue
-              </label>
-            </div>
+         
 
             <div className="space-y-2">
               <label

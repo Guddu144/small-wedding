@@ -26,7 +26,6 @@ const CreateForm:React.FC<UserProps> = ({userEmail}) => {
       zip_code: string;
     };
     region_state: string;
-    featured_venue: boolean;
     gallery: string[];
 
     description: string;
@@ -46,7 +45,7 @@ const CreateForm:React.FC<UserProps> = ({userEmail}) => {
       zip_code: "",
     },
     region_state: "",
-    featured_venue: false,
+
     gallery: [],
  
     description: "",
@@ -128,19 +127,15 @@ const CreateForm:React.FC<UserProps> = ({userEmail}) => {
         className=" grid md:grid-cols-2 gap-x-3 w-full max-w-2xl mx-auto space-y-4"
       >
   
-        <div>
-          <label
-            htmlFor="venue_user"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Venue User
-          </label>
+        <div className="hidden">
+        
           <input
             id="venue_user"
             type="text"
             value={formData.venue_user}
-          
-             disabled
+            hidden
+            disabled
+             
             required
             className="w-full rounded border p-2 bg-[#f5f5f5]"
           />
@@ -324,18 +319,6 @@ const CreateForm:React.FC<UserProps> = ({userEmail}) => {
         </div>
 
 
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            id="featured_venue"
-            checked={formData.featured_venue}
-            onChange={handleChange}
-             
-          />
-          <label htmlFor="featured_venue" className="text-sm text-gray-700">
-            Featured Venue
-          </label>
-        </div>
 
         <div className="space-y-2">
           <label

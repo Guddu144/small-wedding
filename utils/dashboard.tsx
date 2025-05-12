@@ -28,6 +28,21 @@ export const fetchGetVenueData = async (page = 1, limit = 9) => {
   }
 };
 
+export const fetchGetSuperadminVenueData = async (page = 1, limit = 9) => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/venues/superadmin/get?page=${page}&limit=${limit}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      next: { revalidate: 0 },
+    });
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch data:", error);
+  }
+};
+
 
 
   export const fetchGetSingleVenueData = async (venue_id:string) => {

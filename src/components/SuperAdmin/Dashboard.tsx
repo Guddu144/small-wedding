@@ -1,16 +1,15 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { fetchGetVenueData } from "../../../../utils/dashboard";
-import SearchBox from "./Search/Search";
-import PopupContent from "./Popup/PopupContent";
-import { Charts } from "./Charts/Charts";
-import { Charts2 } from "./Charts/Charts2";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import DropdownMenu from "./Dropdown/Dropdown";
 import toast from "react-hot-toast";
 import { BiHeart } from "react-icons/bi";
-
+import {
+  fetchGetSuperadminVenueData,
+  fetchGetVenueData,
+} from "../../../utils/dashboard";
+import DropdownMenu from "../Index/Dropdown/Dropdown";
+import { FaCircleCheck } from "react-icons/fa6";
 interface Venue {
   user_role: string;
   venueId: string;
@@ -28,7 +27,7 @@ interface Venue {
   region_state: string;
   featured_venue: boolean;
   gallery: string[];
-
+venue_status:string;
   description: string;
   venue_type: string;
   created_date: string;
@@ -37,13 +36,13 @@ interface Venue {
 interface UserProps {
   userRole: string;
 }
-const Venues: React.FC<UserProps> = ({ userRole }) => {
+const VenuesSuperadmin: React.FC<UserProps> = ({ userRole }) => {
   const [venues, setVenues] = useState<Venue[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
   const fetchNewData = async () => {
     try {
-      const fetchData = await fetchGetVenueData();
+      const fetchData = await fetchGetSuperadminVenueData();
       console.log(fetchData.result.venues);
       const sortedVenues = fetchData.result.venues.sort(
         (a: Venue, b: Venue) =>
@@ -111,33 +110,50 @@ const Venues: React.FC<UserProps> = ({ userRole }) => {
   };
 
   const [venueStatus, setVenueStatus] = useState(false);
-  const handleVeneueStatus = async (venueId:string) => {
-    setLoading(true);
-    console.log("Response:", venueId);
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/venues/acceptvenue/post`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            venueId: venueId,
-            user_role: "superadmin",
-          }),
-        }
-      );
-      if(res.ok){
-        setVenueStatus(true)
-        toast.success("Added to Wishlist")
+  const [venueStatusMap, setVenueStatusMap] = useState<{
+    [key: string]: boolean;
+  }>({});
+
+const handleVeneueStatus = async (venueId: string) => {
+  setLoading(true);
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_URL}/api/venues/acceptvenue/post`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          venueId,
+          user_role: "superadmin",
+        }),
       }
-      const data = await res.json();
-      console.log("Response:", data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
+    );
+
+    if (res.ok) {
+      toast.success("Status updated successfully!");
+      // Update local state without refetching all
+      setVenues((prev) =>
+        prev.map((venue) =>
+          venue.venueId === venueId
+            ? {
+                ...venue,
+                venue_status:
+                  venue.venue_status === "active" ? "pending" : "active",
+              }
+            : venue
+        )
+      );
+    } else {
+      toast.error("Failed to update status.");
     }
-  };
+  } catch (error) {
+    console.log(error);
+    toast.error("Error updating status.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div>
@@ -198,7 +214,7 @@ const Venues: React.FC<UserProps> = ({ userRole }) => {
                 <th className="px-6 py-3">VenueId</th>
                 <th className="px-6 py-3">Email</th>
                 <th className="px-6 py-3">Location</th>
-
+                <th className="px-6 py-3">Status</th>
                 {userRole == "admin" ||
                 userRole == "venueowner" ||
                 userRole == "superadmin" ? (
@@ -245,7 +261,23 @@ const Venues: React.FC<UserProps> = ({ userRole }) => {
                     </td>
                     <td className="px-6 py-4">{item?.email}</td>
                     <td className="px-6 py-4">{item?.address.country}</td>
-                 
+                  <td className="px-6 py-4">
+  <button aria-label="Verified"
+    onClick={() => {
+      if (item.venue_status !== "active") {
+        handleVeneueStatus(item.venueId);
+      }
+    }}
+    disabled={item.venue_status === "active"}
+    className={` flex justify-center items-center mx-auto ${
+      item.venue_status === "active"
+        ? "text-green-600 cursor-not-allowed text-[20px]"
+        : "bg-green-600 hover:bg-green-700 px-4 py-1 rounded text-white"
+    }`}
+  >
+    {item.venue_status === "active" ? <FaCircleCheck /> : "Accept"}
+  </button>
+</td>
 
                     {userRole == "superadmin" ||
                     userRole == "admin" ||
@@ -290,4 +322,4 @@ const Venues: React.FC<UserProps> = ({ userRole }) => {
   );
 };
 
-export default Venues;
+export default VenuesSuperadmin;
