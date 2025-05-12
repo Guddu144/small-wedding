@@ -8,6 +8,7 @@ import { BiHeart } from "react-icons/bi";
 import { fetchGetVenueData } from "../../../../utils/dashboard";
 import toast, { Toaster } from "react-hot-toast";
 import PopupContent from "@/components/Dashboard/Venues/Popup/PopupContent";
+import Link from "next/link";
 
 interface Venue {
   user_role: string;
@@ -178,6 +179,8 @@ const [open, setOpen] = useState(false);
             >
               SEARCH
             </button>
+
+            <Link href='/dashboard/venue/wishlist' className="bg-[#000] text-white rounded-[10px] px-6 py-3 font-serif text-base font-semibold uppercase tracking-tight shadow hover:brightness-110 transition-colors">Wishlist</Link>
           </form>
         </div>
               <PopupContent open={open} setOpen={setOpen}/>

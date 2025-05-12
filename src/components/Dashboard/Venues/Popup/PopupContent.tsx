@@ -7,7 +7,7 @@ import { RxCross2 } from "react-icons/rx";
 import { BiCurrentLocation } from "react-icons/bi";
 
 
-type PopupContentProps = {
+interface PopupContentProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
