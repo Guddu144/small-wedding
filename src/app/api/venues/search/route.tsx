@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    console.log("Image testing",body)
+
     const reqOptions = {
       method: "POST",
       headers: {
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     };
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_VENUE_URL}/venues`,
+      `${process.env.NEXT_PUBLIC_API_VENUE_URL}/venues/filter`,
       reqOptions
     );
 

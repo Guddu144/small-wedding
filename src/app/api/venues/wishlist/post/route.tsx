@@ -3,15 +3,18 @@ export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-
+  const { venue_id, userId } = await request.json();
+    console.log("Hello Data",venue_id, userId)
     const reqOptions = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
       },
-      body: JSON.stringify(body),
+    body: JSON.stringify({
+          userId: userId,
+          venueId: venue_id,
+        }),
     };
 
     const response = await fetch(

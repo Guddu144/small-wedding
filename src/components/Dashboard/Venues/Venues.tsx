@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import DropdownMenu from "./Dropdown/Dropdown";
 import toast from "react-hot-toast";
 import { BiHeart } from "react-icons/bi";
+import { EmailAddress } from "@clerk/nextjs/server";
 
 interface Venue {
   user_role: string;
@@ -39,9 +40,9 @@ interface Venue {
 
 interface UserProps {
   userRole: string;
-
+  userEmail: string;
 }
-const Venues: React.FC<UserProps> = ({ userRole }) => {
+const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
   const [venues, setVenues] = useState<Venue[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
@@ -75,7 +76,8 @@ const Venues: React.FC<UserProps> = ({ userRole }) => {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-          }, next:{revalidate:0},
+          },
+          next: { revalidate: 0 },
           body: JSON.stringify({
             venue_id: venue_id,
             user_role: userRole,
@@ -110,10 +112,37 @@ const Venues: React.FC<UserProps> = ({ userRole }) => {
     return name.includes(term) || country.includes(term);
   });
 
- 
+  const handleWishList = async (userEmail: string, venueId: string) => {
+    setLoading(true);
+    console.log(userEmail, venueId)
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/venues/wishlist/post`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            venue_id: venueId,
+            userId: userEmail,
+          }),
+        }
+      );
 
-  const handleWishList = () => {
-    router.push("/dashboard/venues/wishlist");
+      const data = await res.json();
+      console.log("Response:", data);
+
+      if (res.ok) {
+        toast.success("Venue added to Wishlist!");
+        router.refresh();
+      } else {
+         toast.error("This venue is already added!");
+      }
+    } catch (error) {
+      console.error("Post error:", error);
+      alert("Something went wrong");
+    } finally {
+      setLoading(false); 
+    }
   };
 
   return (
@@ -240,7 +269,9 @@ const Venues: React.FC<UserProps> = ({ userRole }) => {
                           Delete
                         </button>
                         <button
-                          onClick={() => handleWishList()}
+                          onClick={() =>
+                            handleWishList(userEmail, item?.venueId)
+                          }
                           className="font-medium text-red-600 cursor-pointer py-1 rounded hover:underline text-[20px]"
                         >
                           <BiHeart />

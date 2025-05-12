@@ -78,7 +78,7 @@ const Wishlist: React.FC<UserProps> = ({ userEmail }) => {
 
       if (res.ok) {
         toast.success("Venue Delete from Wishlist Successfully!");
-        await getWishlist(userEmail)
+        await getWishlist(userEmail);
       }
 
       router.push("/dashboard/venue/wishlist");
@@ -88,7 +88,6 @@ const Wishlist: React.FC<UserProps> = ({ userEmail }) => {
       setLoading(false);
     }
   };
-
 
   return (
     <div>
@@ -107,51 +106,51 @@ const Wishlist: React.FC<UserProps> = ({ userEmail }) => {
                 >
                   <img
                     src={
-                      item.gallery?.[0]
+                      item?.gallery?.[0]
                         ? "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsXF_gMShHtqkl8umbb0Nyj9opn9GbxiVKJhKl1LGTbWGmewaVVEdNJPTRwquyQILbAp4&usqp=CAU"
                         : ""
                     }
-                    alt={item.venue_name}
+                    alt={item?.venue_name}
                     className="w-full h-48 object-cover rounded-md mb-4"
                   />
 
                   <h2 className="text-xl font-semibold text-gray-800 mb-2">
-                    {item.venue_name}
+                    {item?.venue_name}
                   </h2>
 
                   <p className="text-sm text-gray-600 mb-2">
-                    {item.description || "No description available."}
+                    {item?.description || "No description available."}
                   </p>
 
                   <p className="text-sm text-gray-500 mb-1">
-                    <strong>Email:</strong> {item.email}
+                    <strong>Email:</strong> {item?.email}
                   </p>
                   <p className="text-sm text-gray-500 mb-1">
-                    <strong>Phone:</strong> {item.phone_no}
+                    <strong>Phone:</strong> {item?.phone_no}
                   </p>
 
                   <p className="text-sm text-gray-500 mb-1">
-                    <strong>Location:</strong> {item.address.city},{" "}
-                    {item.address.state}, {item.address.country}
+                    <strong>Location:</strong> {item?.address?.city},
+                    {item?.address?.state}, {item?.address?.country}
                   </p>
 
                   <p className="text-sm text-gray-500 mb-3">
                     <strong>Status:</strong>{" "}
                     <span
                       className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                        item.venue_status === "active"
+                        item?.venue_status === "active"
                           ? "bg-green-100 text-green-700"
                           : "bg-red-100 text-red-700"
                       }`}
                     >
-                      {item.venue_status}
+                      {item?.venue_status}
                     </span>
                   </p>
 
                   <div className="flex gap-2">
                     <button
                       onClick={() =>
-                        router.push(`/dashboard/venue/view/${item.venueId}`)
+                        router.push(`/dashboard/venue/view/${item?.venueId}`)
                       }
                       className="flex-1 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
                     >
