@@ -16,7 +16,9 @@ export async function POST(request: Request) {
           venueId: venue_id,
         }),
     };
-
+    if(!userId){
+      throw new Error(`No userID`);
+    }
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_VENUE_URL}/wishlist`,
       reqOptions

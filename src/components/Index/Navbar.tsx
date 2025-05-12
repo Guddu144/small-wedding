@@ -103,7 +103,7 @@ export default function Navbar() {
           
           <SignedOut>
             <div className="flex gap-4">
-              <SignInButton mode="modal" forceRedirectUrl="/dashboard" />
+              <SignInButton mode="modal"  />
               {/* <SignUpButton mode="modal" forceRedirectUrl="/dashboard" /> */}
               <CreateOrganization />
               <OrganizationProfile />

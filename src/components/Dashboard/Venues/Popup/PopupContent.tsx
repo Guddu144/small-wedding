@@ -6,30 +6,55 @@ import "./style.css";
 import { RxCross2 } from "react-icons/rx";
 import { BiCurrentLocation } from "react-icons/bi";
 
-const PopupContent = () => (
-  <Dialog.Root>
+
+type PopupContentProps = {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const PopupContent: React.FC<PopupContentProps> = ({ open, setOpen }) => {
+  	
+
+  return (
+    <div>
+       <Dialog.Root open={open} onOpenChange={setOpen}>
     <Dialog.Trigger asChild>
-      <button className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 ">
+      {/* <button className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 ">
         <BiCurrentLocation />
-      </button>
+      </button> */}
     </Dialog.Trigger>
     <Dialog.Portal>
       <Dialog.Overlay className="DialogOverlay" />
       <Dialog.Content className="DialogContent">
-        <Dialog.Title className="DialogTitle">Select the Location</Dialog.Title>
+        <Dialog.Title className="DialogTitle"></Dialog.Title>
         <Dialog.Description className="DialogDescription">
   
         </Dialog.Description>
-        <div className=" overflow-hidden">
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d347981.8230478231!2d-120.01194939391205!3d36.1913146204813!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x808fb9fe5f285e3d%3A0x8b5109a227086f55!2sCalifornia%2C%20USA!5e1!3m2!1sen!2snp!4v1746588439112!5m2!1sen!2snp"
-            width="600"
-            height="450"
-        
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          ></iframe>
-        </div>
+         <div className="w-full max-w-xl bg-white rounded-2xl  p-6">
+        <h2 className="text-2xl font-semibold text-center text-gray-800 mb-4">
+          Subscribe to our newsletter
+        </h2>
+        <p className="text-center text-gray-600 mb-6">
+          Get the latest updates, offers, and news delivered to your inbox.
+        </p>
+        <form className="flex flex-col sm:flex-row items-center gap-3">
+          <input
+            type="email"
+            placeholder="Enter your email"
+            className="flex-1 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+          <button
+            type="submit"
+            className="w-full sm:w-auto bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 transition duration-200"
+          >
+            Subscribe
+          </button>
+        </form>
+        <p className="text-xs text-center text-gray-400 mt-4">
+          We respect your privacy. Unsubscribe at any time.
+        </p>
+      </div>
 
         <Dialog.Close asChild>
           <button className="IconButton" aria-label="Close">
@@ -39,6 +64,8 @@ const PopupContent = () => (
       </Dialog.Content>
     </Dialog.Portal>
   </Dialog.Root>
-);
+    </div>
+  )
+}
 
-export default PopupContent;
+export default PopupContent
