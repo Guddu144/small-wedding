@@ -13,7 +13,7 @@ const services = [
     title: 'officiants',
     image: '/images/services/service2.png',
     description:
-      `In today's connected world, we ensure that distance doesn't keep anyone from saying their goodbyes. With our filming and live streaming services, friends and family in the celebration, sharing in the moment of remembrance.`,
+      `Officiants play a meaningful role in ceremonies, helping couples personalize their vows and create a memorable, heartfelt experience that reflects their beliefs and values.`,
   },
   {
     title: 'Coordination',

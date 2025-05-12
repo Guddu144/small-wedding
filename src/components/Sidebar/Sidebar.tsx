@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import toast, { Toaster } from "react-hot-toast";
 import { IoMdHeart } from "react-icons/io";
 import { fetchGetSuperadminVenueData } from '../../../utils/dashboard';
+import { BiListUl } from 'react-icons/bi';
 
 interface Venue {
   user_role: string;
@@ -140,6 +141,15 @@ const Sidebar: React.FC<SidebarProps> = ({ children, userRole }) => {
             </Link>
               </li>
             )}
+            {userRole=='venueowner'?
+             <li>
+              <Link href="/dashboard/myvenue" className={`${pathname === '/dashboard/myvenue' ? "bg-gray-200" : ""} flex items-center p-2 rounded-lg text-gray-900 hover:bg-gray-100 group`}>
+            
+                <BiListUl  className="w-6 h-6 text-gray-800 group-hover:text-gray-900"/>
+                <span className="ms-3">My Venue</span>
+              </Link>
+            </li>
+            :''}
             <li>
               <Link href="/dashboard/venue/wishlist" className={`${pathname === '/dashboard/venue/wishlist' ? "bg-gray-200" : ""} flex items-center p-2 rounded-lg text-gray-900 hover:bg-gray-100 group`}>
                 <IoMdHeart className="text-gray-500 text-[24px]" />

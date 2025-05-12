@@ -218,9 +218,10 @@ const [open, setOpen] = useState(false);
             {filteredVenues.map((item, idx) => (
               <div
                 key={idx}
-                className="bg-white rounded-2xl border border-[#eae5da] shadow p-4 flex flex-col items-start"
+                className="bg-white rounded-2xl border border-[#eae5da] shadow p-4 flex flex-col justify-between h-full items-center"
               >
-                <div className="w-full h-56 relative mb-4">
+                <div>
+                  <div className="w-full h-56 relative mb-4">
                   <img
                     src={item?.gallery[0]}
                     alt={item?.venue_name}
@@ -263,6 +264,7 @@ const [open, setOpen] = useState(false);
                 <p className="text-navy-900 text-base font-serif mb-6">
                   {item?.description}
                 </p>
+                </div>
                 <div className="flex justify-between w-full gap-4">
                   <button className="w-full px-6 py-4 bg-[#0c3e58] rounded-[10px] inline-flex justify-center items-center gap-2.5">
                     <div className="text-center text-[#f2cc91] text-base font-medium font-['Lora'] uppercase leading-none">

@@ -1,15 +1,10 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import {
-  fetchGetVenueData,
-} from "../../../../utils/dashboard";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import DropdownMenu from "./Dropdown/Dropdown";
-import toast from "react-hot-toast";
-import { BiHeart } from "react-icons/bi";
-import { useDebounce } from "use-debounce";
-import { IoBookmarkOutline } from "react-icons/io5";
+"use client"
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react'
+import { fetchGetVenueData } from '../../../../utils/dashboard';
+import { BiHeart } from 'react-icons/bi';
+import Link from 'next/link';
+import toast from 'react-hot-toast';
 interface Venue {
   user_role: string;
   venueId: string;
@@ -33,39 +28,39 @@ interface Venue {
 }
 
 interface UserProps {
-  userRole: string;
   userEmail: string;
+  userRole:string;
 }
 
-const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
+const MyVenue: React.FC<UserProps> = ({ userEmail,userRole}) => {
   const [venues, setVenues] = useState<Venue[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
-  const router = useRouter();
 
+  const router = useRouter();
   const fetchNewData = async () => {
-    setLoading(true);
-    try {
-      const fetchData = await fetchGetVenueData();
-      const sortedVenues = fetchData.result.venues.sort(
+  setLoading(true);
+  try {
+    const fetchData = await fetchGetVenueData();
+    const filteredVenues = fetchData.result.venues
+      .filter((venue: Venue) => venue.venue_user === userEmail)
+      .sort(
         (a: Venue, b: Venue) =>
           new Date(b.created_date).getTime() -
           new Date(a.created_date).getTime()
       );
-      setVenues(sortedVenues);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    setVenues(filteredVenues);
+  } catch (error) {
+    console.log(error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchNewData();
   }, []);
 
-  const deleteVenue = async (venue_id: string) => {
+   const deleteVenue = async (venue_id: string) => {
     setLoading(true);
     try {
       const res = await fetch(
@@ -130,67 +125,8 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
       setLoading(false);
     }
   };
-
-  const filteredVenues = venues.filter((venue) => {
-    const term = debouncedSearchTerm.toLowerCase();
-    return (
-      venue.venue_name.toLowerCase().includes(term) ||
-      venue.address.country.toLowerCase().includes(term) ||
-      venue.address.city.toLowerCase().includes(term) ||
-      venue.address.state.toLowerCase().includes(term)
-    
-    );
-  });
-
   return (
     <div>
-      <div className="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-3 md:space-y-0 pb-2 bg-white ">
-        <div className="inline-flex items-center gap-2">
-          {/* <DropdownMenu /> */}
-        </div>
-        <div className=" bg-white flex justify-end items-center">
-                 {userRole == "superadmin" ||
-                    userRole == "admin" ||
-                    userRole == "venueowner"  ?
-          <Link
-            href="/dashboard/create"
-            className="text-xl font-bold bg-gray-200 mr-3 hover:bg-gray-400 rounded-[6px] w-8 h-8 flex items-center justify-center transition"
-          >
-            +
-          </Link> : ''}
-          <label htmlFor="table-search" className="sr-only">
-            Search
-          </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-              <svg
-                className="w-4 h-4 text-gray-500"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                />
-              </svg>
-            </div>
-            <input
-              type="text"
-              id="table-search"
-              className="block py-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-100 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Search by venue name, country, city, state, zip"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </div>
-      </div>
-
       <div className="pt-4 relative overflow-x-auto shadow-md sm:rounded-lg">
         <table className="w-full text-sm text-left text-gray-500">
           <thead className="text-xs text-gray-700 uppercase bg-gray-200">
@@ -212,8 +148,8 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
                   </div>
                 </td>
               </tr>
-            ) : filteredVenues.length > 0 ? (
-              filteredVenues.map((item, index) => (
+            ) : venues.length > 0 ? (
+              venues.map((item, index) => (
                 <tr
                   key={index}
                   className="bg-white border-b hover:bg-gray-50"
@@ -244,8 +180,7 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
                   <td className="px-6 py-4">{item?.address?.country}</td>
                 
                     <td className="px-6 py-4 text-right flex gap-3 items-center">
-                        {(userRole === "superadmin" ||
-                    userRole === "admin") && (
+                      
                     <>
                       <Link
                         href={`/dashboard/venue/update/${item?.venueId}`}
@@ -260,7 +195,7 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
                         Delete
                       </button>
                       </>
-                         )}
+                        
                       <button
                         onClick={() => handleWishList(userEmail, item?.venueId)}
                         className="font-medium text-center flex justify-center items-center text-red-600 cursor-pointer  rounded hover:underline text-[20px]"
@@ -282,7 +217,7 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
         </table>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Venues;
+export default MyVenue
