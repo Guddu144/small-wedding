@@ -7,7 +7,7 @@ const SearchUser = () => {
      const [query, setQuery] = useState("");
   return (
     <div className=" bg-white flex justify-end items-center">
-          <RegisterUser/>
+          
           <label htmlFor="table-search" className="sr-only">
             Search
           </label>

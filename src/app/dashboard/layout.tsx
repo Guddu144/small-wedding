@@ -2,17 +2,67 @@
 import { SignedIn, UserButton } from '@clerk/nextjs';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import toast, { Toaster } from "react-hot-toast";
 import { IoMdHeart } from "react-icons/io";
+import { fetchGetSuperadminVenueData } from '../../../utils/dashboard';
+interface Venue {
+  user_role: string;
+  venueId: string;
+  venue_user: string;
+  venue_name: string;
+  phone_no: string;
+  email: string;
+  address: {
+    country: string;
+    state: string;
+    city: string;
+    street: string;
+    zip_code: string;
+  };
+  region_state: string;
+  featured_venue: boolean;
+  gallery: string[];
+  venue_status: string;
+  description: string;
+  venue_type: string;
+  created_date: string;
+}
 const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname=usePathname()
+
+    const [venues, setVenues] = useState<Venue[]>([]);
+
+    const fetchNewData = async () => {
+      try {
+        const fetchData = await fetchGetSuperadminVenueData();
+        console.log(fetchData.result.venues);
+        const sortedVenues = fetchData.result.venues.sort(
+          (a: Venue, b: Venue) =>
+            new Date(b.created_date).getTime() -
+            new Date(a.created_date).getTime()
+        );
+        setVenues(sortedVenues);
+      } catch (error) {
+        console.log(error);
+      } 
+    };
+  
+useEffect(() => {
+  fetchNewData(); // initial fetch
+
+  const interval = setInterval(() => {
+    fetchNewData(); // poll every 10 seconds
+  }, 10000); // adjust this value if needed
+
+  return () => clearInterval(interval); // clean up
+}, []);
   return (
     <>
       {/* Navbar */}
-      <nav className="fixed top-0 z-90 w-full bg-[#000000] border-b border-gray-200 h-[4.1rem]">
+      <nav className="fixed top-0 z-90 w-full bg-[#000000] border-b border-gray-200 h-[4.4rem]">
         <div className="px-3 py-3 lg:px-5 lg:pl-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -77,12 +127,17 @@ const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
                <span className="flex-1 ms-3 whitespace-nowrap">Users</span>
             </Link>
          </li>
+
+          
            <li>
             <Link href="/dashboard/venue/superadmin" className={`${pathname==='/dashboard/venue/superadmin' ? "bg-gray-200":"" } flex items-center p-2 rounded-lg text-gray-900  hover:bg-gray-100 group`}>
                <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75  group-hover:text-gray-900 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
                   <path d="M14 2a3.963 3.963 0 0 0-1.4.267 6.439 6.439 0 0 1-1.331 6.638A4 4 0 1 0 14 2Zm1 9h-1.264A6.957 6.957 0 0 1 15 15v2a2.97 2.97 0 0 1-.184 1H19a1 1 0 0 0 1-1v-1a5.006 5.006 0 0 0-5-5ZM6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Z"/>
                </svg>
-               <span className="flex-1 ms-3 whitespace-nowrap">SuperAdmin</span>
+               <span className="flex-1 ms-3 whitespace-nowrap">Requests</span>
+                              <span className="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full ">         {venues.filter(item => item?.venue_status === 'pending').length}</span>
+
+ 
             </Link>
          </li>
 

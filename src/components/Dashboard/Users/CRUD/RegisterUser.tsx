@@ -19,7 +19,7 @@ export default function RegisterUser() {
     setMessage("");
 
     try {
-      const res = await fetch("/api/createuser", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/createuser`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

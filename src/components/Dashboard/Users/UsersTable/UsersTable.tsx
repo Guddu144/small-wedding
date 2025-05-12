@@ -3,12 +3,25 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
-interface PropsUserData {
-  data: any[];
-  userRole: string;
+interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  unsafeMetadata: {
+    role: string;
+    [key: string]: any;
+  };
+  [key: string]: any;
 }
 
-const UsersTable: React.FC<PropsUserData> = ({ data, userRole }) => {
+interface PropsUserData {
+  data: User[];
+  userRole: string;
+  setUsers: React.Dispatch<React.SetStateAction<User[]>>;
+}
+
+const UsersTable: React.FC<PropsUserData> = ({ data, userRole ,setUsers }) => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -33,7 +46,13 @@ const UsersTable: React.FC<PropsUserData> = ({ data, userRole }) => {
 
 const handleDelete = async (user_id: string) => {
   await deleteUser(user_id);
-  window.location.reload(); // Hard refresh the page
+  const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/getuser`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const data = await res.json();
+  setUsers(data.users);
 };
 
   return (
@@ -50,11 +69,9 @@ const handleDelete = async (user_id: string) => {
         </thead>
         <tbody>
           {loading ? (
-            <tr>
-              <td colSpan={5} className="px-6 py-4 text-center">
-                Loading...
-              </td>
-            </tr>
+             <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
+                      <div className="loader"></div>
+                    </div>
           ) : data?.length > 0 ? (
             data.map((user: any, index: number) => (
               <tr key={index} className="bg-white border-b hover:bg-gray-50">

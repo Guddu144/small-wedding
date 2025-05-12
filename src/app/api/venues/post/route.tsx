@@ -15,7 +15,7 @@ AWS.config.update({
 const s3 = new AWS.S3();
 import { Buffer } from 'buffer';
 
-export async function uploadFilesToS3(files) {
+export async function uploadFilesToS3(files:any) {
   const bucketName = 'venue-image-bucket';
   const uploadedFiles = [];
 
@@ -46,7 +46,7 @@ export async function uploadFilesToS3(files) {
   return uploadedFiles;
 }
 
-export async function deleteFileFromS3(fileKey) {
+export async function deleteFileFromS3(fileKey:any) {
   const bucketName = 'venue-image-bucket';
   const params = {
     Bucket: bucketName,

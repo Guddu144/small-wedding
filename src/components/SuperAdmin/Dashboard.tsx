@@ -10,6 +10,7 @@ import {
 } from "../../../utils/dashboard";
 import DropdownMenu from "../Index/Dropdown/Dropdown";
 import { FaCircleCheck } from "react-icons/fa6";
+import { useDebounce } from "use-debounce";
 interface Venue {
   user_role: string;
   venueId: string;
@@ -39,6 +40,8 @@ interface UserProps {
 const VenuesSuperadmin: React.FC<UserProps> = ({ userRole }) => {
   const [venues, setVenues] = useState<Venue[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
   const router = useRouter();
   const fetchNewData = async () => {
     try {
@@ -82,7 +85,7 @@ const VenuesSuperadmin: React.FC<UserProps> = ({ userRole }) => {
         toast.success("Venue Delete Successfully!");
       }
 
-      router.push("/dashboard");
+
     } catch (error) {
       console.error("Delete error:", error);
     } finally {
@@ -97,13 +100,17 @@ const VenuesSuperadmin: React.FC<UserProps> = ({ userRole }) => {
     }
   };
 
-  const [searchTerm, setSearchTerm] = useState("");
-  // const filteredVenues = venues.filter((venue) => {
-  //   const name = venue.venue_name.toLowerCase();
-  //   const country = venue.address.country.toLowerCase();
-  //   const term = searchTerm.toLowerCase();
-  //   return name.includes(term) || country.includes(term);
-  // });
+
+  const filteredVenues = venues.filter((venue) => {
+    const term = debouncedSearchTerm.toLowerCase();
+    return (
+      venue.venue_name.toLowerCase().includes(term) ||
+      venue.address.country.toLowerCase().includes(term) ||
+      venue.address.city.toLowerCase().includes(term) ||
+      venue.address.state.toLowerCase().includes(term)
+    
+    );
+  });
 
   const handleWishList = () => {
     router.push("/dashboard/venues/wishlist");
@@ -238,8 +245,8 @@ const VenuesSuperadmin: React.FC<UserProps> = ({ userRole }) => {
                     </div>
                   </td>
                 </tr>
-              ) : venues.length > 0 ? (
-                venues.map((item, index) => (
+              ) : filteredVenues.length > 0 ? (
+                filteredVenues.map((item, index) => (
                   <tr
                     key={index}
                     className="bg-white border-b hover:bg-gray-50"
@@ -252,17 +259,21 @@ const VenuesSuperadmin: React.FC<UserProps> = ({ userRole }) => {
                     <td className="px-6 py-4">{item?.description}</td>
                     <td className="px-6 py-4">
                       {item?.venueId}
-                      {item?.gallery && (
-                        <img
+                   
+
+                      {item?.gallery?.map((items,index)=>{
+                        return(
+                           <img key={index}
                           className="w-20 h-20 mt-2 object-cover"
                           src={
-                            item?.gallery[0]
-                              ? item?.gallery[0]
+                            items
+                              ? items
                               : "No Image"
                           }
                           alt="venue"
                         />
-                      )}
+                        )
+                      })}
                     </td>
                     <td className="px-6 py-4">{item?.email}</td>
                     <td className="px-6 py-4">{item?.address.country}</td>

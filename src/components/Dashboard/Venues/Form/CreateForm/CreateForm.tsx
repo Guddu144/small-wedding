@@ -98,14 +98,17 @@ const CreateForm: React.FC<UserProps> = ({ userEmail }) => {
       formDataToSubmit.append("venue_type", formData.venue_type);
 
       // Append gallery images to form data
-      if (formData.gallery.length > 0) {
-        formData.gallery.forEach((fileName, index) => {
-          const file = document.getElementById("gallery")?.files?.[index];
-          if (file) {
-            formDataToSubmit.append("gallery", file);
-          }
-        });
-      }
+  // Append gallery images to form data
+if (formData.gallery.length > 0) {
+  const input = document.getElementById("gallery") as HTMLInputElement;
+  const fileList = input?.files;
+
+  if (fileList) {
+    Array.from(fileList).forEach((file) => {
+      formDataToSubmit.append("gallery", file);
+    });
+  }
+}
 
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_URL}/api/venues/post`,

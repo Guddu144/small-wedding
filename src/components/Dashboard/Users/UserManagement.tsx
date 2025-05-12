@@ -47,11 +47,12 @@ const UserManagement: React.FC<Props> = ({ userRole }) => {
   return (
     <div>
       <div className="flex justify-between gap-4">
-        <UsersDropdownMenu />
-        <SearchUser />
+        {/* <UsersDropdownMenu /> */}
+        {/* <SearchUser /> */}
+        <RegisterUser/>
       </div>
 
-      <UsersTable userRole={userRole} data={users} />
+      <UsersTable setUsers={setUsers} userRole={userRole} data={users} />
     </div>
   );
 };

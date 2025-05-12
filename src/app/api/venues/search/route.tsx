@@ -3,7 +3,8 @@ export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+const body = await request.json();
+const { queryKey } = body; // ✅ Correct way
 
     const reqOptions = {
       method: "POST",
@@ -11,7 +12,11 @@ export async function POST(request: Request) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        filters:{
+          country:queryKey
+        }
+      }),
     };
 
     const response = await fetch(
