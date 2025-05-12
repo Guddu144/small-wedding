@@ -175,15 +175,19 @@ const VenuesSuperadmin: React.FC<UserProps> = ({ userRole }) => {
       </div>
       <div className="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-3 md:space-y-0 pb-2 bg-white ">
         <div className="inline-flex items-center gap-2">
-          <DropdownMenu />
+          {/* <DropdownMenu /> */}
         </div>
         <div className=" bg-white flex justify-end items-center">
+          
+                    {userRole == "superadmin" ||
+                    userRole == "admin" ||
+                    userRole == "venueowner"  &&
           <Link
             href="/dashboard/create"
             className="text-xl font-bold bg-gray-200 mr-3 hover:bg-gray-400 rounded-[6px] w-8 h-8 flex items-center justify-center transition"
           >
             +
-          </Link>
+          </Link>}
           <label htmlFor="table-search" className="sr-only">
             Search
           </label>
@@ -257,14 +261,14 @@ const VenuesSuperadmin: React.FC<UserProps> = ({ userRole }) => {
                       </Link>
                     </td>
                     <td className="px-6 py-4">{item?.description}</td>
-                    <td className="px-6 py-4">
-                      {item?.venueId}
+                    <td className="px-6 py-4 flex gap-2">
+                 
                    
 
                       {item?.gallery?.map((items,index)=>{
                         return(
                            <img key={index}
-                          className="w-20 h-20 mt-2 object-cover"
+                          className="w-12 h-12 mt-2 object-cover"
                           src={
                             items
                               ? items

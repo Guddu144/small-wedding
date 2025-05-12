@@ -72,9 +72,17 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     console.log("formData: ", formData);
     const body: any = {};
-    formData.forEach((value, key) => {
-      body[key] = value;
-    });
+formData.forEach((value, key) => {
+  if (["country", "state", "city", "street", "zip_code"].includes(key)) {
+    body.address = {
+      ...body.address,
+      [key]: value,
+    };
+  } else {
+    body[key] = value;
+  }
+});
+
     body.user_role="superadmin"
     console.log("Form data received:", body);
 
@@ -111,7 +119,6 @@ export async function POST(request: Request) {
 
     const data = await response.json();
     console.log("POST response data:", data);
-
     return NextResponse.json({ success: true, data });
   } catch (error: any) {
     console.error("Error posting data:", error.message);

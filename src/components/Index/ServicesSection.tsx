@@ -8,7 +8,7 @@ const services = [
       'Our team is adept at finding the perfect setting that holds significance to your loved one and your family. Be it a serene outdoor location or a majestic hall, we work closely with prestigious venues to provide a fitting backdrop for the service.',
   },
   {
-    title: 'Filming or Live Streaming',
+    title: 'Officiants',
     image: '/images/services/service2.png',
     description:
       

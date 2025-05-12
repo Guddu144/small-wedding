@@ -9,7 +9,7 @@ import DropdownMenu from "./Dropdown/Dropdown";
 import toast from "react-hot-toast";
 import { BiHeart } from "react-icons/bi";
 import { useDebounce } from "use-debounce";
-
+import { IoBookmarkOutline } from "react-icons/io5";
 interface Venue {
   user_role: string;
   venueId: string;
@@ -146,15 +146,18 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
     <div>
       <div className="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-3 md:space-y-0 pb-2 bg-white ">
         <div className="inline-flex items-center gap-2">
-          <DropdownMenu />
+          {/* <DropdownMenu /> */}
         </div>
         <div className=" bg-white flex justify-end items-center">
+                 {userRole == "superadmin" ||
+                    userRole == "admin" ||
+                    userRole == "venueowner"  &&
           <Link
             href="/dashboard/create"
             className="text-xl font-bold bg-gray-200 mr-3 hover:bg-gray-400 rounded-[6px] w-8 h-8 flex items-center justify-center transition"
           >
             +
-          </Link>
+          </Link>}
           <label htmlFor="table-search" className="sr-only">
             Search
           </label>
@@ -197,9 +200,7 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
               <th className="px-6 py-3">VenueId</th>
               <th className="px-6 py-3">Email</th>
               <th className="px-6 py-3">Location</th>
-              {(userRole === "admin" ||
-                userRole === "venueowner" ||
-                userRole === "superadmin") && <th className="px-6 py-3">Action</th>}
+             <th className="px-6 py-3">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -223,22 +224,30 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
                     </Link>
                   </td>
                   <td className="px-6 py-4">{item?.description}</td>
-                  <td className="px-6 py-4">
-                    {item?.venueId}
-                    {item?.gallery && (
-                      <img
-                        className="w-20 h-20 mt-2 object-cover"
-                        src={item?.gallery[0] || "No Image"}
-                        alt="venue"
-                      />
-                    )}
+                  <td className="px-6 py-4 flex gap-1">
+           
+                    {item?.gallery?.map((items,index)=>{
+                        return(
+                           <img key={index}
+                          className="w-12 h-12 mt-2 object-cover"
+                          src={
+                            items
+                              ? items
+                              : "No Image"
+                          }
+                          alt="venue"
+                        />
+                        )
+                      })}
                   </td>
                   <td className="px-6 py-4">{item?.email}</td>
                   <td className="px-6 py-4">{item?.address?.country}</td>
-                  {(userRole === "superadmin" ||
+                
+                    <td className="px-6 py-4 text-right flex gap-3 items-center">
+                        {(userRole === "superadmin" ||
                     userRole === "admin" ||
                     userRole === "venueowner") && (
-                    <td className="px-6 py-4 text-right flex gap-3 items-center">
+                    <>
                       <Link
                         href={`/dashboard/venue/update/${item?.venueId}`}
                         className="font-medium bg-blue-600 text-white cursor-pointer px-4 py-1 rounded hover:underline"
@@ -251,14 +260,16 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
                       >
                         Delete
                       </button>
+                      </>
+                         )}
                       <button
                         onClick={() => handleWishList(userEmail, item?.venueId)}
-                        className="font-medium text-red-600 cursor-pointer py-1 rounded hover:underline text-[20px]"
+                        className="font-medium text-center flex justify-center items-center text-red-600 cursor-pointer  rounded hover:underline text-[20px]"
                       >
-                        <BiHeart />
+                     <BiHeart/>
                       </button>
                     </td>
-                  )}
+               
                 </tr>
               ))
             ) : (
