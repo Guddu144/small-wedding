@@ -146,7 +146,7 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
     <div>
       <div className="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-3 md:space-y-0 pb-2 bg-white ">
         <div className="inline-flex items-center gap-2">
-          {/* <DropdownMenu /> */}
+          <DropdownMenu />
         </div>
         <div className=" bg-white flex justify-end items-center">
                  {userRole == "superadmin" ||

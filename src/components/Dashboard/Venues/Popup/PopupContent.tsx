@@ -4,6 +4,7 @@ import { Dialog } from "radix-ui";
 import "./style.css";
 
 import { RxCross2 } from "react-icons/rx";
+import { SignIn, SignInButton } from "@clerk/nextjs";
 
 
 
@@ -26,36 +27,17 @@ const PopupContent: React.FC<PopupContentProps> = ({ open, setOpen }) => {
     <Dialog.Portal>
       <Dialog.Overlay className="DialogOverlay" />
       <Dialog.Content className="DialogContent">
-        <Dialog.Title className="DialogTitle"></Dialog.Title>
+        <Dialog.Title className="DialogTitle">Just want to check in on you</Dialog.Title>
         <Dialog.Description className="DialogDescription">
-  
+          
         </Dialog.Description>
-         <div className="w-full max-w-xl bg-white rounded-2xl  p-6">
-        <h2 className="text-2xl font-semibold text-center text-gray-800 mb-4">
-          Subscribe to our newsletter
-        </h2>
-        <p className="text-center text-gray-600 mb-6">
-          Get the latest updates, offers, and news delivered to your inbox.
-        </p>
-        <form className="flex flex-col sm:flex-row items-center gap-3">
-          <input
-            type="email"
-            placeholder="Enter your email"
-            className="flex-1 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-          <button
-            type="submit"
-            className="w-full sm:w-auto bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 transition duration-200"
-          >
-            Subscribe
-          </button>
-        </form>
-        <p className="text-xs text-center text-gray-400 mt-4">
-          We respect your privacy. Unsubscribe at any time.
-        </p>
-      </div>
-
+        <div className="venues_cart_auth flex flex-col ">
+          <p className="max-w-[400px] DialogDescription">H1,  we hope you are finding information helpful during this difficcult time, if you would like to take a break, please enter your email below with a password, and we can pick up wher you left off. If you would like to continue, please do so, clicking below</p>
+<SignIn
+  routing="virtual"
+  signUpUrl="/sign-up"
+/>
+</div>
         <Dialog.Close asChild>
           <button className="IconButton" aria-label="Close">
             <RxCross2 />

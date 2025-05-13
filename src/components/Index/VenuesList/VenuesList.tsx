@@ -9,6 +9,8 @@ import { fetchGetVenueData } from "../../../../utils/dashboard";
 import toast, { Toaster } from "react-hot-toast";
 import PopupContent from "@/components/Dashboard/Venues/Popup/PopupContent";
 import Link from "next/link";
+import { SignInButton } from "@clerk/nextjs";
+import { SignIn } from "@clerk/clerk-react";
 
 interface Venue {
   user_role: string;
@@ -113,7 +115,7 @@ const [open, setOpen] = useState(false);
     <main className="min-h-screen bg-[#f5f3ef]">
       {/* <Navbar /> */}
       {/* Hero Section */}
-
+      
       <section className="relative h-[380px] md:h-[420px] flex items-center justify-center text-center overflow-hidden">
         <video
           className="absolute top-0 left-0 w-full h-full object-cover z-0"
@@ -179,10 +181,14 @@ const [open, setOpen] = useState(false);
             >
               SEARCH
             </button>
-
+            {userEmail && 
             <Link href='/dashboard/venue/wishlist' className="bg-[#000] text-white rounded-[10px] px-6 py-3 font-serif text-base font-semibold uppercase tracking-tight shadow hover:brightness-110 transition-colors">Wishlist</Link>
-          </form>
+         } </form>
         </div>
+
+      
+   
+
               <PopupContent open={open} setOpen={setOpen}/>
         {/* Venues Grid */}
         {loading ? (
