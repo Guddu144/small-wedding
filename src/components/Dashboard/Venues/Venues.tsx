@@ -75,8 +75,14 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
   }, []);
 
   const handleLogout = () => {
-    // In a real app, you would clear auth tokens, etc.
-    // For example: localStorage.removeItem('token');
+    localStorage.clear();
+    sessionStorage.clear();
+
+    document.cookie.split(";").forEach((cookie) => {
+      const name = cookie.split("=")[0].trim();
+      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
+    });
+
     router.push('/');
   };
 
