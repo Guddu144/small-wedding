@@ -5,7 +5,7 @@ const ProtectedLayout = async ({ children }: { children: React.ReactNode }) => {
   const user = await currentUser();
   const userRole = user?.publicMetadata?.role as string;
 
-  return <Sidebar userRole={userRole}>{children}</Sidebar>;
+  return <div>{children}</div>;
 };
 
 export default ProtectedLayout;
