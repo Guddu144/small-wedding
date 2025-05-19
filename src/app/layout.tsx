@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import Navbar from "@/components/Index/Navbar";
+import DashboardLayout from "./root-layout";
 const lora = Lora({
   subsets: ["latin"],
   display: "swap",
@@ -47,8 +48,7 @@ export default function RootLayout({
         <body
           className={`${lora.variable} ${montserrat.variable} ${poppins.variable} antialiased`}
         >
-          <Navbar />
-          {children}
+          <DashboardLayout children={children} />
         </body>
       </html>
     </ClerkProvider>

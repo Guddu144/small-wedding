@@ -31,10 +31,10 @@ export default function Navbar() {
     <header className="absolute top-0 left-0 w-full z-50 py-4 px-6 md:px-12 border-b text-[white] border-white/10">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center">
-          <Link href="/" aria-label="Celebration of Life Concierge">
+          <Link href="/" aria-label="Honoring Lifetimes">
             <Image
               src="/images/logos/logo.svg"
-              alt="Celebration of Life Concierge"
+              alt="Honoring Lifetimes"
               width={200}
               height={50}
               priority
@@ -88,31 +88,15 @@ export default function Navbar() {
          
           </SignedIn>
              <Link
-            href="#planning"
+            href="get-started"
             className="h-12 px-6 py-4 bg-gradient-to-b from-[#957748] to-[#ac8b57] rounded-[10px] outline outline-1 outline-offset-[-1px] outline-[#a89578] inline-flex justify-center items-center gap-2.5 transition-colors hover:brightness-110"
             tabIndex={0}
-            aria-label="Let's Start Planning"
+            aria-label="Get Started"
           >
             <div className="text-center justify-start text-white text-base font-semibold font-['Lora'] uppercase leading-[14px] tracking-tight">
-              Let's Start Planning
+              Get Started
             </div>
           </Link>
-                 <SignedOut>
-                  <DropdownMenu/>
-                 </SignedOut>
-          
-          <SignedOut>
-            <div className="flex gap-4">
-              <SignInButton mode="modal"  />
-              {/* <SignUpButton mode="modal" forceRedirectUrl="/dashboard" /> */}
-              <CreateOrganization />
-              <OrganizationProfile />
-            </div>
-          </SignedOut>
-
-          <SignedIn>
-            <UserButton />
-          </SignedIn>
         </nav>
 
         {/* Mobile Menu Button */}
@@ -181,10 +165,10 @@ export default function Navbar() {
             href="#planning"
             className="h-12 px-6 py-4 bg-gradient-to-b from-[#957748] to-[#ac8b57] rounded-[10px] outline outline-1 outline-offset-[-1px] outline-[#a89578] inline-flex justify-center items-center gap-2.5 transition-colors hover:brightness-110 w-full"
             tabIndex={0}
-            aria-label="Let's Start Planning"
+            aria-label="Get Started"
           >
             <div className="text-center justify-start text-white text-base font-semibold font-['Lora'] uppercase leading-[14px] tracking-tight">
-              Let's Start Planning
+              Get Started
             </div>
           </Link>
         </nav>

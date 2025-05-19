@@ -6,14 +6,12 @@ import {
 } from "../../../../utils/dashboard";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import DropdownMenu from "./Dropdown/Dropdown";
 import toast from "react-hot-toast";
 import { BiHeart } from "react-icons/bi";
 import { useDebounce } from "use-debounce";
 import { IoBookmarkOutline } from "react-icons/io5";
 import Image from "next/image";
-import AddVenueDrawer from "./AddVenue";
-import AddVenueForm from "./AddVenue";
+import { Heart } from "lucide-react";
 export interface Venue {
   user_role: string;
   venueId: string;
@@ -45,15 +43,12 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
   const [venues, setVenues] = useState<Venue[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedVenue, setSelectedVenue] = useState<any|null>(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState('venue');
   const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
   const router = useRouter();
   const [favorites, setFavorites] = useState<{[key: number]: boolean}>({});
-  const [formstate, setFormstate] = useState<"add"|"edit">("add");
 
   const fetchNewData = async () => {
     setLoading(true);
@@ -96,41 +91,6 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
     await handleWishList(userEmail, id.toString());
   };
 
-  const deleteVenue = async (venue_id: string) => {
-    setLoading(true);
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/venues/delete?venue_id=${venue_id}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          next: { revalidate: 0 },
-          body: JSON.stringify({
-            venue_id: venue_id,
-            user_role: userRole,
-          }),
-        }
-      );
-
-      if (res.ok) {
-        toast.success("Venue Delete Successfully!");
-      }
-    } catch (error) {
-      console.error("Delete error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async (venue_id: string) => {
-    if (confirm("Are you sure you want to delete this venue?")) {
-      await deleteVenue(venue_id);
-      await fetchNewData();
-    }
-  };
-
   const handleWishList = async (userEmail: string, venueId: string) => {
     setLoading(true);
     try {
@@ -159,22 +119,6 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
       alert("Something went wrong");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchVenueById = async (venueId: string) => {
-    try {
-      const fetchData= await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/venues/getone?venue_id=${venueId}`,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        }
-      )
-      const data = await fetchData.json();
-      setSelectedVenue(data);
-    } catch (error) {
-      console.log(error);
     }
   };
 
@@ -208,6 +152,9 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
             />
           </div>
           <div className="flex items-center gap-3 relative" ref={dropdownRef}>
+            <svg className="w-5 h-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+                      </svg>
             <div className="w-8 h-8 bg-[#a89578] rounded-full flex items-center justify-center text-white">
               <span>P</span>
             </div>
@@ -251,39 +198,8 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
 
       {/* Main content */}
       <main className="container mx-auto">
-        {/* Navigation Tabs */}
-        <div className="flex border-b border-[#e0d8cb] mb-6">
-          <button 
-            className={`flex items-center gap-2 px-6 py-2 text-[#0C3E58] font-medium ${activeTab === 'venue' ? 'border-b-2 border-[#a89578]' : ''}`}
-            onClick={() => setActiveTab('venue')}
-          >
-            <svg className="w-5 h-5 text-[#a89578]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 7.184V6a2 2 0 00-2-2H7a2 2 0 00-2 2v1.184A3 3 0 004 10v10a1 1 0 001 1h14a1 1 0 001-1V10a3 3 0 00-1-2.816zM18 8a1 1 0 011 1v1h-2V8h1zM7 6h10v4H7V6zM6 8H5a1 1 0 00-1 1v1h2V8z" />
-            </svg>
-            MANAGE VENUE
-          </button>
-          <button 
-            className={`flex items-center gap-2 px-6 py-4 text-[#0C3E58] font-medium ${activeTab === 'wishlist' ? 'border-b-2 border-[#a89578]' : ''}`}
-            onClick={() => setActiveTab('wishlist')}
-          >
-            <svg className="w-5 h-5 text-[#a89578]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-            </svg>
-            WISHLIST
-          </button>
-          <button 
-            className={`flex items-center gap-2 px-6 py-4 text-[#0C3E58] font-medium ${activeTab === 'notification' ? 'border-b-2 border-[#a89578]' : ''}`}
-            onClick={() => setActiveTab('notification')}
-          >
-            <svg className="w-5 h-5 text-[#a89578]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
-            </svg>
-            NOTIFICATION
-          </button>
-        </div>
-
         {/* Search and filters */}
-        <div className="flex justify-between mb-8 px-6">
+        <div className="flex justify-between mt-6 mb-8 px-6">
           <div className="flex gap-4 flex-1 max-w-3xl">
             <div className="relative flex-1">
               <input 
@@ -319,34 +235,10 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
               </svg>
             </div>
           </div>
-          <button 
-            className="bg-[#0a3b5b] text-white px-4 py-3 rounded-md font-medium flex items-center gap-2"
-            onClick={() =>{ 
-                  setDrawerOpen(true) ;
-                  setFormstate("add")}}
-          >
-            <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-            </svg>
-            ADD NEW VENUE
-          </button>
         </div>
 
         {/* Venues Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-6 pb-8">
-          {/* New Venue Card */}
-          <div 
-            className="border border-gray-200 rounded-lg overflow-hidden bg-[#f7f4ef] flex flex-col items-center justify-center py-12 cursor-pointer"
-            onClick={() => {setDrawerOpen(true); setFormstate("add")}}
-          >
-            <div className="w-16 h-16 bg-[#a89578] rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <p className="text-[#0a3b5b] font-medium text-center">ADD NEW VENUE</p>
-          </div>
-
           {/* Venue Cards */}
           {filteredVenues.length > 0 ? (
             filteredVenues.map((venue) => (
@@ -373,7 +265,6 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
                 </div>
                 <div className="p-4">
                   <h3 className="text-[#0a3b5b] font-semibold text-xl mb-2">{venue.venue_name}</h3>
-                  {/* <p className="text-gray-600 text-sm mb-3">{venue.description}</p> */}
                   <p className="text-gray-600 text-sm mb-3 line-clamp-3 overflow-hidden overflow-ellipsis">
                     {venue.description}
                   </p>
@@ -383,27 +274,9 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
                     </svg>
                     <span className="text-sm">{venue.address.country}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <div className="flex space-x-2">
-                      <button className="p-2 border border-gray-200 rounded hover:bg-gray-100" onClick={()=>handleDelete(venue.venueId)}>
-                        <svg className="w-5 h-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                        </svg>
-                      </button>
-                      <button className="p-2 border border-gray-200 rounded hover:bg-gray-100"  onClick={async () => {
-                            setDrawerOpen(true); 
-                            fetchVenueById(venue.venueId);
-                            setFormstate("edit");
-                          }}>
-                        <svg className="w-5 h-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                        </svg>
-                      </button>
-                    </div>
-                    <button className="text-[#0a3b5b] font-medium text-sm border border-gray-200 rounded px-4 py-2 hover:bg-gray-100">
-                      View More
-                    </button>
-                  </div>
+                  <button className="w-full text-[#0a3b5b] font-medium text-sm border border-gray-200 rounded px-4 py-2 hover:bg-gray-100">
+                    View More
+                  </button>
                 </div>
               </div>
             ))
@@ -414,7 +287,6 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
           )}
         </div>
       </main>
-      <AddVenueForm value={selectedVenue?.result} fetchNewData={fetchNewData}  drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} formstate={formstate} userRole={userRole} userEmail={userEmail}/>
     </div>
   );
 };

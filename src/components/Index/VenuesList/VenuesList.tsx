@@ -10,7 +10,6 @@ import toast, { Toaster } from "react-hot-toast";
 import PopupContent from "@/components/Dashboard/Venues/Popup/PopupContent";
 import Link from "next/link";
 import { SignInButton } from "@clerk/nextjs";
-import { SignIn } from "@clerk/clerk-react";
 
 interface Venue {
   user_role: string;
