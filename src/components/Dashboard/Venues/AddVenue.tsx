@@ -29,7 +29,25 @@ const AddVenueDrawer = ({ value, drawerOpen, setDrawerOpen, userRole, userEmail,
     venue_type: "event",
   };
 
-  const [formData, setFormData] = useState(initialFormState);
+  const [formData, setFormData] = useState<{
+  user_role: string;
+  venue_user: string;
+  venue_name: string;
+  phone_no: string;
+  email: string;
+  address: {
+    country: string;
+    state: string;
+    city: string;
+    street: string;
+    zip: string;
+  };
+  region_state: string;
+  gallery: string[]; // ✅ Fix here
+  description: string;
+  venue_type: string;
+}>(initialFormState);
+
 
   useEffect(() => {
     if (drawerOpen && formstate === "add") {
@@ -57,8 +75,8 @@ const AddVenueDrawer = ({ value, drawerOpen, setDrawerOpen, userRole, userEmail,
     }
   }, [drawerOpen, value, userEmail]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value, type, checked, files } = e.target;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement| HTMLTextAreaElement>) => {
+    const { id, value, type, checked, files } = e.target  as HTMLInputElement;
 
     const addressFields = ["country", "state", "city", "street", "zip"];
     if (addressFields.includes(id)) {
@@ -83,8 +101,6 @@ const AddVenueDrawer = ({ value, drawerOpen, setDrawerOpen, userRole, userEmail,
   };
 
   const handleSubmit = async (e: any) => {
-    console.log("handleSubmit");
-
     e.preventDefault();
 
     setLoading(true);
@@ -349,14 +365,13 @@ if (formData.gallery.length > 0) {
             </div> */}
             
             {/* Location */}
-            <div>
+            {/* <div>
               <label htmlFor="location" className="block text-[#0a3b5b] font-medium mb-2">Location</label>
               <select 
                 id="location" 
                 name="location"
                 className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-[#a89578] text-[#0a3b5b]"
                 value={formData?.region_state}
-                onChange={handleChange}
                 required
               >
                 <option value="california">California</option>
@@ -366,7 +381,7 @@ if (formData.gallery.length > 0) {
                 <option value="washington">Washington</option>
                 <option value="oregon">Oregon</option>
               </select>
-            </div>
+            </div> */}
 
             <div>
               <label
