@@ -1,136 +1,189 @@
-import { useState } from 'react';
-import Image from 'next/image';
+"use client";
+import { useEffect, useState } from 'react';
 import { Images } from 'lucide-react';
-import { uploadFilesToS3 } from '../../../../utils/uploadFilesTos3';
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 
-const AddVenueDrawer = ({ value, drawerOpen, setDrawerOpen, userRole, userEmail }:{value:any, drawerOpen:boolean, setDrawerOpen:any, userRole:string, userEmail:string}) => {
-  const [newVenue, setNewVenue] = useState({
-  name: '',
-  description: '',
-  address: '',
-  location: 'california',
-  street: '',
-  city: '',
-  state: '',
-  zip: '',
-  country: '',
-  phone: '',
-  email: '',
-  type: '',
-  images: [] as File[],
-  imagePreviewUrls: [] as string[]
-});
-
-  const handleVenueChange = (e) => {
-    const { name, value } = e.target;
-    setNewVenue(prev => ({
-      ...prev,
-      [name]: value
-    }));
+const AddVenueDrawer = ({ value, drawerOpen, setDrawerOpen, userRole, userEmail,formstate,fetchNewData }:
+  {value:any, drawerOpen:boolean, setDrawerOpen:any, userRole:string, userEmail:string,formstate:"add"|"edit", fetchNewData: () => Promise<void> }) => {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  
+  const initialFormState = {
+    user_role: "admin",
+    venue_user: userEmail,
+    venue_name: "",
+    phone_no: "",
+    email: userEmail,
+    address: {
+      country: "",
+      state: "",
+      city: "",
+      street: "",
+      zip: "",
+    },
+    region_state: "",
+    gallery: [],
+    description: "",
+    venue_type: "event",
   };
 
-  // const handleImageUpload = (e) => {
-  //   const files = Array.from(e.target.files);
-    
-  //   const newImageUrls = files.map(file => URL.createObjectURL(file));
-    
-  //   setNewVenue(prev => ({
-  //     ...prev,
-  //     imagePreviewUrls: [...prev.imagePreviewUrls, ...newImageUrls]
-  //   }));
-  // };
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const files = Array.from(e.target.files || []);
-  const newImageUrls = files.map(file => URL.createObjectURL(file));
+  const [formData, setFormData] = useState(initialFormState);
 
-  setNewVenue(prev => ({
-    ...prev,
-    images: [...prev.images, ...files],
-    imagePreviewUrls: [...prev.imagePreviewUrls, ...newImageUrls]
-  }));
-};
+  useEffect(() => {
+    if (drawerOpen && formstate === "add") {
+      setFormData(initialFormState);
+    }
+    else if (drawerOpen && value) {
+      setFormData({
+        user_role: "admin",
+        venue_user: userEmail,
+        venue_name: value?.venue_name || "",
+        phone_no: value?.phone_no || "",
+        email: userEmail,
+        address: {
+          country: value?.address?.country || "",
+          state: value?.address?.state || "",
+          city: value?.address?.city || "",
+          street: value?.address?.street || "",
+          zip: value?.address?.zip || "",
+        },
+        region_state: value?.region_state || "",
+        gallery: value?.gallery || [],
+        description: value?.description || "",
+        venue_type: value?.venue_type || "event",
+      });
+    }
+  }, [drawerOpen, value, userEmail]);
 
-const removeImage = (index: number) => {
-  setNewVenue(prev => ({
-    ...prev,
-    images: prev.images.filter((_, i) => i !== index),
-    imagePreviewUrls: prev.imagePreviewUrls.filter((_, i) => i !== index)
-  }));
-};
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value, type, checked, files } = e.target;
 
-  // const removeImage = (index) => {
-  //   setNewVenue(prev => ({
-  //     ...prev,
-  //     imagePreviewUrls: prev.imagePreviewUrls.filter((_, i) => i !== index)
-  //   }));
-  // };
+    const addressFields = ["country", "state", "city", "street", "zip"];
+    if (addressFields.includes(id)) {
+      setFormData((prev) => ({
+        ...prev,
+        address: {
+          ...prev.address,
+          [id]: value,
+        },
+      }));
+    } else if (id === "gallery") {
+      const fileList = files;
+      if (fileList) {
+        const fileNames = Array.from(fileList).map((file) => file.name);
+        setFormData((prev) => ({ ...prev, gallery: fileNames }));
+      }
+    } else if (type === "checkbox") {
+      setFormData((prev) => ({ ...prev, [id]: checked }));
+    } else {
+      setFormData((prev) => ({ ...prev, [id]: value }));
+    }
+  };
 
-const addVenue = async () => {
-  try {
-    const uploadedUrls = await uploadFilesToS3(newVenue.images);
-    const payload = {
-      venue_user: userEmail,
-      venue_name: newVenue.name,
-      phone_no: newVenue.phone,
-      email: newVenue.email,
-      address: {
-        street: newVenue.street,
-        city: newVenue.city,
-        state: newVenue.state,
-        zip: newVenue.zip,
-        country: newVenue.country
-      },
-      gallery: uploadedUrls, 
-      description: newVenue.description,
-      type: newVenue.type,
-      user_role: userRole
-    };
+  const handleSubmit = async (e: any) => {
+    console.log("handleSubmit");
 
-    const reqOptions = {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    };
+    e.preventDefault();
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_VENUE_URL}/venues`, reqOptions);
+    setLoading(true);
+    try {
+      // Prepare form data for submission
+      const formDataToSubmit = new FormData();
+      formDataToSubmit.append("venue_user", formData.venue_user);
+      formDataToSubmit.append("venue_name", formData.venue_name);
+      formDataToSubmit.append("phone_no", formData.phone_no);
+      formDataToSubmit.append("email", formData.email);
+      formDataToSubmit.append("country", formData.address.country);
+      formDataToSubmit.append("state", formData.address.state);
+      formDataToSubmit.append("city", formData.address.city);
+      formDataToSubmit.append("street", formData.address.street);
+      formDataToSubmit.append("zip", formData.address.zip);
+      formDataToSubmit.append("description", formData.description);
+      formDataToSubmit.append("venue_type", formData.venue_type);
 
-    if (!response.ok) throw new Error(`Failed to post data: ${response.statusText}`);
+      // Append gallery images to form data
+  // Append gallery images to form data
+if (formData.gallery.length > 0) {
+  const input = document.getElementById("gallery") as HTMLInputElement;
+  const fileList = input?.files;
 
-    setNewVenue({
-      name: '',
-      description: '',
-      address: '',
-      location: 'california',
-      street: '',
-      city: '',
-      state: '',
-      zip: '',
-      country: '',
-      phone: '',
-      email: '',
-      type: '',
-      images: [],
-      imagePreviewUrls: []
+  if (fileList) {
+    Array.from(fileList).forEach((file) => {
+      formDataToSubmit.append("gallery", file);
     });
+  }
+}
 
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/venues/post`,
+        {
+          method: "POST",
+          body: formDataToSubmit,
+        }
+      );
+
+      const data = await res.json();
+      setDrawerOpen(false);
+      await fetchNewData();
+
+      if (res.ok) {
+        toast.success("Venue created successfully!");
+      } else {
+        alert("Error: " + data.error);
+      }
+    } catch (error) {
+      console.error("Post error:", error);
+      alert("Something went wrong");
+    } finally {
+      // setLoading(false);
+    }
+  };
+
+  const handleEditVenue = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  if (!value?.venueId) {
+    toast.error("Venue ID is missing");
+    return;
+  }
+
+  setLoading(true);
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_URL}/api/venues/update?venue_id=${value.venueId}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData), 
+      }
+    );
+
+    const data = await response.json();
     setDrawerOpen(false);
+    await fetchNewData();
+    if (response.ok) {
+      toast.success("Venue updated successfully!");
+    } else {
+      toast.error("Error: " + (data.error || "Failed to update venue"));
+    }
   } catch (error) {
-    console.error("Error adding venue:", error);
-    alert("Failed to add venue. Please try again.");
+    console.error("Update error:", error);
+    toast.error("Something went wrong while updating the venue");
+  } finally {
+    setLoading(false);
   }
 };
-
 
   return (
     <div className={`fixed inset-0 bg-black/60 bg-opacity-50 z-40 transition-opacity duration-300 ${drawerOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
       <div className={`fixed top-0 right-0 h-full w-full max-w-md bg-white transform transition-transform duration-300 ease-in-out shadow-xl overflow-y-auto ${drawerOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold text-[#0a3b5b]">Add New Venue</h2>
+            <h2 className="text-2xl font-semibold text-[#0a3b5b]">{formstate==="add"?`Add New Venue`:`Edit Venue`}</h2>
             <button 
               className="text-gray-500 hover:text-gray-700"
               onClick={() => setDrawerOpen(false)}
@@ -143,19 +196,18 @@ const addVenue = async () => {
           
           <div className="space-y-6">
             {/* Venue Name */}
-            <div>
-              <label htmlFor="name" className="block text-[#0a3b5b] font-medium mb-2">Venue Name</label>
+          <form onSubmit={formstate==="add"?handleSubmit:handleEditVenue} encType="multipart/form-data" className="space-y-6">
+              <label htmlFor="venue_name" className="block text-[#0a3b5b] font-medium mb-2">Venue Name</label>
               <input 
                 type="text" 
-                id="name" 
+                id="venue_name" 
                 name="name"
                 placeholder="e.g. Ocean View Terrace" 
                 className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-[#a89578] text-[#0a3b5b]"
-                value={newVenue.name}
-                onChange={handleVenueChange}
+                value={formData?.venue_name??''}
+                onChange={handleChange}
                 required
               />
-            </div>
             
             {/* Description */}
             <div>
@@ -166,14 +218,123 @@ const addVenue = async () => {
                 rows={4}
                 placeholder="Describe your venue..." 
                 className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-[#a89578] text-[#0a3b5b]"
-                value={newVenue.description}
-                onChange={handleVenueChange}
+                value={formData?.description}
+                onChange={handleChange}
                 required
               />
             </div>
-            
-            {/* Address */}
+
             <div>
+              <label htmlFor="phone_no" className="block text-[#0a3b5b] font-medium mb-2">Phone No</label>
+              <input 
+                id="phone_no" 
+                name="phone_no"
+                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-[#a89578] text-[#0a3b5b]"
+                value={formData?.phone_no}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+              <div>
+              <label
+                htmlFor="email"
+                className="block text-[#0a3b5b] font-medium mb-2"
+              >
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={formData?.email}
+                disabled
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-[#a89578] text-[#0a3b5b]"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="country"
+                className="block text-[#0a3b5b] font-medium mb-2"
+              >
+                Country
+              </label>
+              <input
+                id="country"
+                type="text"
+                value={formData?.address?.country}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-[#a89578] text-[#0a3b5b]"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="state"
+                className="block text-[#0a3b5b] font-medium mb-2"
+              >
+                State
+              </label>
+              <input
+                id="state"
+                type="text"
+                value={formData?.address?.state}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-[#a89578] text-[#0a3b5b]"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="city"
+                className="block text-[#0a3b5b] font-medium mb-2"
+              >
+                City
+              </label>
+              <input
+                id="city"
+                type="text"
+                value={formData?.address?.city}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-[#a89578] text-[#0a3b5b]"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="street"
+                className="block text-[#0a3b5b] font-medium mb-2"
+              >
+                Street
+              </label>
+              <input
+                id="street"
+                type="text"
+                value={formData?.address?.street}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-[#a89578] text-[#0a3b5b]"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="zip"
+                className="block text-[#0a3b5b] font-medium mb-2"
+              >
+                Zip Code
+              </label>
+              <input
+                id="zip"
+                type="text"
+                value={formData?.address?.zip}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-[#a89578] text-[#0a3b5b]"
+              />
+            </div>
+            {/* Address */}
+            {/* <div>
               <label htmlFor="address" className="block text-[#0a3b5b] font-medium mb-2">Address</label>
               <input 
                 type="text" 
@@ -181,11 +342,11 @@ const addVenue = async () => {
                 name="address"
                 placeholder="Full street address" 
                 className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-[#a89578] text-[#0a3b5b]"
-                value={newVenue.address}
-                onChange={handleVenueChange}
+                value={value?.address}
+                onChange={handleChange}
                 required
               />
-            </div>
+            </div> */}
             
             {/* Location */}
             <div>
@@ -194,8 +355,8 @@ const addVenue = async () => {
                 id="location" 
                 name="location"
                 className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-[#a89578] text-[#0a3b5b]"
-                value={newVenue.location}
-                onChange={handleVenueChange}
+                value={formData?.region_state}
+                onChange={handleChange}
                 required
               >
                 <option value="california">California</option>
@@ -206,30 +367,28 @@ const addVenue = async () => {
                 <option value="oregon">Oregon</option>
               </select>
             </div>
-            
-            {/* Image Upload */}
+
             <div>
-              <label className="block text-[#0a3b5b] font-medium mb-2">Upload Images</label>
-              <div className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center">
-                <input 
-                  type="file" 
-                  id="images" 
-                  accept="image/*" 
-                  multiple
-                  className="hidden"
-                  onChange={handleImageUpload}
-                />
-                <label htmlFor="images" className="cursor-pointer">
-                  <Images className="mx-auto h-12 w-12 text-gray-300" strokeWidth={1.5} />
-                  <p className="mt-4 text-[#0a3b5b]">Drag and drop image files or click to upload</p>
-                  <p className="mt-1 text-sm text-gray-500">PNG, JPG, GIF up to 10MB</p>
-                </label>
-              </div>
-              
+              <label
+                htmlFor="venue_type"
+                className="block text-[#0a3b5b] font-medium mb-2"
+              >
+                Venue Type
+              </label>
+              <input
+                id="venue_type"
+                type="text"
+                value={formData.venue_type}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-[#a89578] text-[#0a3b5b]"
+              />
+            </div>
+            
               {/* Image Previews */}
-              {newVenue.imagePreviewUrls.length > 0 && (
+              {/* {value.imagePreviewUrls.length > 0 && (
                 <div className="mt-4 grid grid-cols-3 gap-2">
-                  {newVenue.imagePreviewUrls.map((url, index) => (
+                  {value.imagePreviewUrls.map((url, index) => (
                     <div key={index} className="relative">
                       <div className="relative h-24 rounded overflow-hidden">
                         <Image src={url} alt={`Preview ${index}`} fill className="object-cover" />
@@ -245,18 +404,41 @@ const addVenue = async () => {
                     </div>
                   ))}
                 </div>
+              )} */}
+            <div>
+              <label className="block text-[#0a3b5b] font-medium mb-2">Upload Images</label>
+              <div className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center">
+                <input 
+                  id="gallery"
+                  type="file"
+                  multiple
+                  onChange={handleChange}
+                  className="hidden"
+                />
+                <label htmlFor="gallery" className="block cursor-pointer">
+                  <Images className="mx-auto h-12 w-12 text-gray-300" strokeWidth={1.5} />
+                  <p className="mt-4 text-[#0a3b5b]">Drag and drop image files or click to upload</p>
+                  <p className="mt-1 text-sm text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                </label>
+              </div>
+              
+              {/* Display selected file names */}
+              {formData.gallery.length > 0 && (
+                <div className="mt-2">
+                  <p className="text-sm text-gray-600">Selected files: {formData.gallery.join(', ')}</p>
+                </div>
               )}
             </div>
             
             {/* Submit Button */}
             <div className="flex justify-end pt-4">
-              <button 
+              <button type='submit'
                 className="h-12 px-8 py-4 bg-gradient-to-b from-[#957748] to-[#ac8b57] rounded-[10px] outline outline-1 outline-offset-[-1px] outline-[#a89578] inline-flex justify-center items-center transition-colors hover:brightness-110"
-                onClick={addVenue}
               >
-                <span className="text-center text-white font-semibold font-serif uppercase tracking-tight">ADD VENUE</span>
+                <span className="text-center text-white font-semibold font-serif uppercase tracking-tight">{formstate==="add"?`ADD VENUE`:`EDIT VENUE`}</span>
               </button>
             </div>
+          </form>
           </div>
         </div>
       </div>

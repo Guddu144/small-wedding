@@ -8,41 +8,61 @@ import Navbar from '@/components/Index/Navbar';
 import { useSignUp } from '@clerk/nextjs';
 
 export default function GetStartedPage() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  // const router = useRouter();
-  // const [email, setEmail] = useState('');
-  // const [password, setPassword] = useState('');
-  
-  // const handleContinue = (e: React.FormEvent) => {
-    //   e.preventDefault();
-    //   // Handle signup logic here
-    //   // Then redirect to dashboard or next step
-    //   router.push('/dashboard');
-    // };
-    
-    // Initialize video when component mounts
-    
   const [accountType, setAccountType] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const { isLoaded, signUp, setActive } = useSignUp();
   const [emailAddress, setEmailAddress] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [verifying, setVerifying] = React.useState(false);
-  const [code, setCode] = React.useState("");
+  const [code, setCode] = useState<string[]>(new Array(6).fill(''));
+  const inputRefs = useRef<Array<HTMLInputElement | null>>(new Array(6).fill(null));
+  const videoRef = useRef<HTMLVideoElement>(null);
   const router = useRouter();
   const [error, setError] = React.useState("");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-const [codeError, setCodeError] = React.useState("");
-console.log(accountType, emailAddress, password);
+  const [codeError, setCodeError] = React.useState("");
 
-  const isPasswordValid = (pwd: any) => {
+  const isPasswordValid = (pwd: string) => {
     const lengthCheck = pwd.length >= 8;
     const letterCheck = /[A-Za-z]/.test(pwd);
     const numberCheck = /[0-9]/.test(pwd);
     return lengthCheck && letterCheck && numberCheck;
   };
 
-  // Handle submission of the sign-up form
+  const handleInputChange = (index: number, value: string) => {
+    const newCode = [...code];
+    newCode[index] = value;
+    setCode(newCode);
+
+    if (value && index < 5 && inputRefs.current[index + 1]) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !code[index] && index > 0 && inputRefs.current[index - 1]) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const setInputRef = (index: number) => (el: HTMLInputElement | null) => {
+    inputRefs.current[index] = el;
+  };
+
+  const handleResendCode = async () => {
+    if (!isLoaded) return;
+    
+    try {
+      await signUp?.prepareEmailAddressVerification({
+        strategy: "email_code",
+      });
+      setCodeError("");
+    } catch (err: any) {
+      setCodeError("Failed to resend code. Please try again.");
+      console.error(JSON.stringify(err, null, 2));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -66,7 +86,6 @@ console.log(accountType, emailAddress, password);
 
     if (!isLoaded) return;
 
-    // Start the sign-up process using the email and password provided
     try {
       setIsSubmitting(true);
       await signUp.create({
@@ -77,17 +96,12 @@ console.log(accountType, emailAddress, password);
         },
       });
 
-      // Send the user an email with the verification code
       await signUp.prepareEmailAddressVerification({
         strategy: "email_code",
       });
 
-      // Set 'verifying' true to display second form
-      // and capture the OTP code
       setVerifying(true);
     } catch (err: any) {
-      // See https://clerk.com/docs/custom-flows/error-handling
-      // for more info on error handling
       const clerkError = err?.errors?.[0];
       if (clerkError?.code === "form_identifier_exists") {
         setError("An account with this email already exists.");
@@ -105,36 +119,29 @@ console.log(accountType, emailAddress, password);
   // Handle the submission of the verification form
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
+    setCodeError("");
 
     if (!isLoaded) return;
-    if (!code.trim()) {
-      setCodeError("Please enter the verification code.");
+    
+    const verificationCode = code.join('');
+    if (verificationCode.length !== 6) {
+      setCodeError("Please enter the full 6-digit verification code.");
       return;
     }
 
     try {
-      // Use the code the user provided to attempt verification
       const completeSignUp = await signUp.attemptEmailAddressVerification({
-        code,
+        code: verificationCode,
       });
 
-      // If verification was completed, set the session to active
-      // and redirect the user
       if (completeSignUp.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId });
         router.push("/");
       } else {
-        // If the status is not complete, check why. User may need to
-        // complete further steps.
-            console.error("Verification not complete:", completeSignUp);
-
-        console.error(JSON.stringify(completeSignUp, null, 2));
+        console.error("Verification not complete:", completeSignUp);
       }
     } catch (err: any) {
-      // See https://clerk.com/docs/custom-flows/error-handling
-      // for more info on error handling
- 
-         setCodeError("The verification code is incorrect. Please try again.");
+      setCodeError("The verification code is incorrect. Please try again.");
       console.error("Error:", JSON.stringify(err, null, 2));
     }
   };
@@ -145,53 +152,103 @@ console.log(accountType, emailAddress, password);
     }
   }, []);
 
-
-  // Display the verification form to capture the OTP code
-if (verifying) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-100/80 backdrop-blur-sm px-4">
-      <form
-        onSubmit={handleVerify}
-        className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 space-y-6"
-      >
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
-          Verify Your Email
-        </h1>
-
-        <div>
-          <label
-            htmlFor="code"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Enter your verification code
-          </label>
-          <input
-            value={code}
-            id="code"
-            name="code"
-            onChange={(e) => setCode(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-            placeholder="123456"
-            required
-          />
-        </div>
-
-        {codeError && (
-          <div className="text-red-600 text-sm text-center bg-red-100 border border-red-300 px-4 py-2 rounded-md">
-            {codeError}
-          </div>
-        )}
-
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 font-medium rounded-lg hover:bg-blue-700 transition duration-300"
+  if (verifying) {
+    return (
+      <main className="min-h-screen flex flex-col relative">
+        {/* Video Background */}
+        <video 
+          ref={videoRef}
+          className="absolute top-0 left-0 w-full h-full object-cover z-0" 
+          autoPlay 
+          muted 
+          loop 
+          playsInline
+          aria-hidden="true"
         >
-          Verify
-        </button>
-      </form>
-    </div>
-  );
-}
+          <source src="/videos/cloud.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        
+        {/* Blue Overlay */}
+        <div 
+          className="absolute top-0 left-0 w-full h-full z-0" 
+          style={{ backgroundColor: '#082447', opacity: 0.5 }}
+          aria-hidden="true"
+        ></div>
+
+        {/* Navigation */}
+        <Navbar />
+
+        {/* Verification Form Card */}
+        <div className="flex-1 flex justify-center items-center relative z-10">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-8">
+            <div className="mb-6">
+              <Link href="/get-started" className="text-[#0a3b5b] flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+                </svg>
+                Back to sign up
+              </Link>
+            </div>
+            
+            <h1 className="text-[#0a3b5b] text-3xl font-serif font-semibold mb-4">We emailed you a code</h1>
+            <p className="text-[#0a3b5b]/80 mb-8">
+              Enter the verification code sent to: <span className="text-[#957748] font-medium">{emailAddress}</span>
+            </p>
+            
+            <form onSubmit={handleVerify}>
+              {/* Code Input Fields */}
+              <div className="flex justify-between gap-2 mb-8">
+                {code.map((digit, index) => (
+                  <input
+                    key={index}
+                    ref={setInputRef(index)}
+                    type="text"
+                    maxLength={1}
+                    className="w-full h-16 border border-gray-300 rounded-lg text-center text-2xl text-[#0a3b5b] focus:outline-none focus:ring-2 focus:ring-[#957748]"
+                    value={digit}
+                    onChange={(e) => handleInputChange(index, e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(index, e)}
+                    aria-label={`Digit ${index + 1} of verification code`}
+                  />
+                ))}
+              </div>
+              
+              {codeError && (
+                <div className="text-red-500 text-center mb-4">
+                  {codeError}
+                </div>
+              )}
+              
+              {/* Resend Code */}
+              <div className="mb-8 text-center">
+                <p className="text-[#0a3b5b]">
+                  Didn't get your code? 
+                  <button 
+                    type="button" 
+                    className="text-[#957748] font-medium hover:underline ml-2"
+                    onClick={handleResendCode}
+                  >
+                    Send a new code
+                  </button>
+                </p>
+              </div>
+              
+              {/* Verify Button */}
+              <div className="flex justify-center">
+                <button 
+                  type="submit"
+                  className="w-full max-w-xs py-3 bg-gradient-to-b from-[#957748] to-[#ac8b57] rounded-lg text-white font-semibold uppercase tracking-wide hover:opacity-90 transition-opacity"
+                >
+                  VERIFY EMAIL
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
 
   return (

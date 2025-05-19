@@ -31,10 +31,10 @@ export default function Navbar() {
     <header className="absolute top-0 left-0 w-full z-50 py-4 px-6 md:px-12 border-b text-[white] border-white/10">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center">
-          <Link href="/" aria-label="Celebration of Life Concierge">
+          <Link href="/" aria-label="Honoring Lifetimes">
             <Image
               src="/images/logos/logo.svg"
-              alt="Celebration of Life Concierge"
+              alt="Honoring Lifetimes"
               width={200}
               height={50}
               priority

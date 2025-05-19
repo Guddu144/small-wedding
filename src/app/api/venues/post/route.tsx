@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { uploadFilesToS3 } from "../../../../../utils/uploadFilesTos3";
+import toast from "react-hot-toast";
 export const dynamic = "force-dynamic";
 
 
@@ -45,7 +46,9 @@ export async function POST(request: Request) {
       reqOptions
     );
 
-    if (!response.ok) {
+    if (response.ok) {
+        toast.success("Venue created successfully!");
+      } else {
       throw new Error(`Failed to post data: ${response.statusText}`);
     }
 

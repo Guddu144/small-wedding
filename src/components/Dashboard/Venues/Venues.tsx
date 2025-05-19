@@ -13,6 +13,7 @@ import { useDebounce } from "use-debounce";
 import { IoBookmarkOutline } from "react-icons/io5";
 import Image from "next/image";
 import AddVenueDrawer from "./AddVenue";
+import AddVenueForm from "./AddVenue";
 export interface Venue {
   user_role: string;
   venueId: string;
@@ -52,6 +53,7 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
   const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
   const router = useRouter();
   const [favorites, setFavorites] = useState<{[key: number]: boolean}>({});
+  const [formstate, setFormstate] = useState<"add"|"edit">("add");
 
   const fetchNewData = async () => {
     setLoading(true);
@@ -162,8 +164,15 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
 
   const fetchVenueById = async (venueId: string) => {
     try {
-      const fetchData = await fetchGetVenueDataById(venueId);
-      setSelectedVenue(fetchData);
+      const fetchData= await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/venues/getone?venue_id=${venueId}`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        }
+      )
+      const data = await fetchData.json();
+      setSelectedVenue(data);
     } catch (error) {
       console.log(error);
     }
@@ -312,7 +321,9 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
           </div>
           <button 
             className="bg-[#0a3b5b] text-white px-4 py-3 rounded-md font-medium flex items-center gap-2"
-            onClick={() => setDrawerOpen(true)}
+            onClick={() =>{ 
+                  setDrawerOpen(true) ;
+                  setFormstate("add")}}
           >
             <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
@@ -326,7 +337,7 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
           {/* New Venue Card */}
           <div 
             className="border border-gray-200 rounded-lg overflow-hidden bg-[#f7f4ef] flex flex-col items-center justify-center py-12 cursor-pointer"
-            onClick={() => setDrawerOpen(true)}
+            onClick={() => {setDrawerOpen(true); setFormstate("add")}}
           >
             <div className="w-16 h-16 bg-[#a89578] rounded-lg flex items-center justify-center mb-4">
               <svg className="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -380,8 +391,9 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
                         </svg>
                       </button>
                       <button className="p-2 border border-gray-200 rounded hover:bg-gray-100"  onClick={async () => {
-                            setDrawerOpen(true); // open drawer immediately
+                            setDrawerOpen(true); 
                             fetchVenueById(venue.venueId);
+                            setFormstate("edit");
                           }}>
                         <svg className="w-5 h-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                           <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
@@ -402,7 +414,7 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
           )}
         </div>
       </main>
-      <AddVenueDrawer value={selectedVenue} drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} userRole={userRole} userEmail={userEmail}/>
+      <AddVenueForm value={selectedVenue?.result} fetchNewData={fetchNewData}  drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} formstate={formstate} userRole={userRole} userEmail={userEmail}/>
     </div>
   );
 };
