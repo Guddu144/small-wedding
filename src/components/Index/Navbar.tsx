@@ -95,6 +95,7 @@ export default function Navbar() {
               DASHBOARD
             </Link>
           </SignedIn>
+          <SignedOut>
             <Link
             href="get-started"
             className="h-12 px-6 py-4 bg-gradient-to-b from-[#957748] to-[#ac8b57] rounded-[10px] outline outline-1 outline-offset-[-1px] outline-[#a89578] inline-flex justify-center items-center gap-2.5 transition-colors hover:brightness-110"
@@ -105,6 +106,8 @@ export default function Navbar() {
               Get Started
             </div>
           </Link>
+          </SignedOut>
+
         </nav>
 
         {/* Mobile Menu Button */}
