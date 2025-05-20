@@ -181,11 +181,11 @@ if (formData.gallery.length > 0) {
     const data = await response.json();
     setDrawerOpen(false);
     await fetchNewData();
-    if (response.ok) {
-      toast.success("Venue updated successfully!");
-    } else {
-      toast.error("Error: " + (data.error || "Failed to update venue"));
-    }
+    // if (response.ok) {
+    //   toast.success("Venue updated successfully!");
+    // } else {
+    //   toast.error("Error: " + (data.error || "Failed to update venue"));
+    // }
   } catch (error) {
     console.error("Update error:", error);
     toast.error("Something went wrong while updating the venue");
