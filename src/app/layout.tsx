@@ -34,8 +34,8 @@ const poppins = Poppins({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 export const metadata: Metadata = {
-  title: "Celebration of Life",
-  description: "Celebration of Life",
+  title: "Honoring lifetimes",
+  description: "Honoring lifetimes",
 };
 export default function RootLayout({
   children,
