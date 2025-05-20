@@ -2,18 +2,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   fetchGetVenueData,
-  fetchGetVenueDataById,
 } from "../../../../utils/dashboard";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import DropdownMenu from "./Dropdown/Dropdown";
 import toast from "react-hot-toast";
-import { BiHeart } from "react-icons/bi";
 import { useDebounce } from "use-debounce";
-import { IoBookmarkOutline } from "react-icons/io5";
 import Image from "next/image";
-import AddVenueDrawer from "./AddVenue";
 import AddVenueForm from "./AddVenue";
+import { useClerk } from "@clerk/nextjs";
+import VenueModal from "./Popup/ViewMore";
 export interface Venue {
   user_role: string;
   venueId: string;
@@ -42,6 +38,7 @@ interface UserProps {
 }
 
 const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
+  const { signOut } = useClerk();
   const [venues, setVenues] = useState<Venue[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -52,8 +49,10 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
   const [activeTab, setActiveTab] = useState('venue');
   const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
   const router = useRouter();
-  const [favorites, setFavorites] = useState<{[key: number]: boolean}>({});
+  // const [favorites, setFavorites] = useState<{[key: string]: boolean}>({});
   const [formstate, setFormstate] = useState<"add"|"edit">("add");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [wishlist, setWishlist] = useState<string[]>([]);
 
   const fetchNewData = async () => {
     setLoading(true);
@@ -76,25 +75,18 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
     fetchNewData();
   }, []);
 
-  const handleLogout = () => {
-    localStorage.clear();
-    sessionStorage.clear();
 
-    document.cookie.split(";").forEach((cookie) => {
-      const name = cookie.split("=")[0].trim();
-      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
-    });
+    const handleLogout = () => {
+      signOut(() => router.push('/'));
+    };
 
-    router.push('/');
-  };
-
-  const toggleFavorite = async (id: number) => {
-    setFavorites(prev => ({
-      ...prev,
-      [id]: !prev[id]
-    }));
-    await handleWishList(userEmail, id.toString());
-  };
+  // const toggleFavorite = async (id: string) => {
+  //   setFavorites(prev => ({
+  //     ...prev,
+  //     [id]: !prev[id]
+  //   }));
+  //   await handleWishList(userEmail, id.toString());
+  // };
 
   const deleteVenue = async (venue_id: string) => {
     setLoading(true);
@@ -131,36 +123,37 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
     }
   };
 
-  const handleWishList = async (userEmail: string, venueId: string) => {
-    setLoading(true);
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/venues/wishlist/post`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            venue_id: venueId,
-            userId: userEmail,
-          }),
-        }
-      );
+  // const handleWishList = async (userEmail: string, venueId: string) => {
+  //   setLoading(true);
+  //   try {
+  //     const res = await fetch(
+  //       `${process.env.NEXT_PUBLIC_URL}/api/venues/wishlist/post`,
+  //       {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify({
+  //           venue_id: venueId,
+  //           userId: userEmail,
+  //         }),
+  //       }
+  //     );
 
-      const data = await res.json();
-
-      if (res.ok) {
-        toast.success("Venue added to Wishlist!");
-        router.refresh();
-      } else {
-        toast.error("This venue is already added!");
-      }
-    } catch (error) {
-      console.error("Post error:", error);
-      alert("Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     const data = await res.json();
+  //     if (!res.ok) {
+  //     const errorMessage = data.apiError?.error || data.error || "Failed to update wishlist";
+  //     toast.error(errorMessage);
+  //     return;
+  //   }
+    
+  //       toast.success(data.message|| "Wishlist item created successfully!");
+  //       router.refresh();
+  //   } catch (error) {
+  //     console.error("Post error:", error);
+  //     alert("Something went wrong");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const fetchVenueById = async (venueId: string) => {
     try {
@@ -193,15 +186,34 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
     setSearchTerm(e.target.value);
   };
 
+    const handleOpenModal = (venue: Venue) => {
+      setSelectedVenue(venue);
+      setIsModalOpen(true);
+    };
+  
+    const handleCloseModal = () => {
+      setIsModalOpen(false);
+    };
+  
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
+      {selectedVenue && (
+              <VenueModal
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                venue={selectedVenue}
+                showWishlist={false}
+                // isInWishlist={wishlist.includes(selectedVenue.venueId)}
+              />
+            )}
       <header className="bg-[#0a3b5b] text-white px-3 py-3">
         <div className="container mx-auto flex justify-between items-center">
           <div>
             <Image 
               src="/images/logos/logo.svg" 
-              alt="Celebration of Life Concierge" 
+              alt="Honoring Lifetimes" 
               width={200} 
               height={50}
               priority
@@ -261,15 +273,6 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
               <path d="M19 7.184V6a2 2 0 00-2-2H7a2 2 0 00-2 2v1.184A3 3 0 004 10v10a1 1 0 001 1h14a1 1 0 001-1V10a3 3 0 00-1-2.816zM18 8a1 1 0 011 1v1h-2V8h1zM7 6h10v4H7V6zM6 8H5a1 1 0 00-1 1v1h2V8z" />
             </svg>
             MANAGE VENUE
-          </button>
-          <button 
-            className={`flex items-center gap-2 px-6 py-4 text-[#0C3E58] font-medium ${activeTab === 'wishlist' ? 'border-b-2 border-[#a89578]' : ''}`}
-            onClick={() => setActiveTab('wishlist')}
-          >
-            <svg className="w-5 h-5 text-[#a89578]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-            </svg>
-            WISHLIST
           </button>
           <button 
             className={`flex items-center gap-2 px-6 py-4 text-[#0C3E58] font-medium ${activeTab === 'notification' ? 'border-b-2 border-[#a89578]' : ''}`}
@@ -350,7 +353,7 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
           {/* Venue Cards */}
           {filteredVenues.length > 0 ? (
             filteredVenues.map((venue) => (
-              <div key={venue.venueId} className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+              <div key={venue.venueId} className="border border-gray-200 rounded-lg overflow-hidden bg-white flex flex-col h-full">
                 <div className="relative h-48">
                   <Image 
                     src={venue.gallery[0]}
@@ -359,19 +362,19 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
                     className="object-cover"
                   />
                   {/* Heart icon in the corner */}
-                  <div className="absolute top-3 right-3 z-10">
+                  {/* <div className="absolute top-3 right-3 z-10">
                     <button 
                       className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-colors"
-                      onClick={() => toggleFavorite(Number(venue.venueId))}
-                      aria-label={favorites[Number(venue.venueId)] ? "Remove from favorites" : "Add to favorites"}
+                      onClick={() => toggleFavorite((venue.venueId))}
+                      aria-label={favorites[venue.venueId] ? "Remove from favorites" : "Add to favorites"}
                     >
-                      <svg className={`w-5 h-5 ${favorites[Number(venue.venueId)] ? 'text-red-500' : 'text-gray-300'}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <svg className={`w-5 h-5 ${favorites[venue.venueId] ? 'text-red-500' : 'text-gray-300'}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
                       </svg>
                     </button>
-                  </div>
+                  </div> */}
                 </div>
-                <div className="p-4">
+                <div className="p-4 flex flex-col flex-grow">
                   <h3 className="text-[#0a3b5b] font-semibold text-xl mb-2">{venue.venue_name}</h3>
                   {/* <p className="text-gray-600 text-sm mb-3">{venue.description}</p> */}
                   <p className="text-gray-600 text-sm mb-3 line-clamp-3 overflow-hidden overflow-ellipsis">
@@ -383,7 +386,7 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
                     </svg>
                     <span className="text-sm">{venue.address.country}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between mt-auto">
                     <div className="flex space-x-2">
                       <button className="p-2 border border-gray-200 rounded hover:bg-gray-100" onClick={()=>handleDelete(venue.venueId)}>
                         <svg className="w-5 h-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -400,7 +403,7 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
                         </svg>
                       </button>
                     </div>
-                    <button className="text-[#0a3b5b] font-medium text-sm border border-gray-200 rounded px-4 py-2 hover:bg-gray-100">
+                    <button onClick={() => handleOpenModal(venue)} className="text-[#0a3b5b] font-medium text-sm border border-gray-200 rounded px-4 py-2 hover:bg-gray-100">
                       View More
                     </button>
                   </div>

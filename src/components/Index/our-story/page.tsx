@@ -34,7 +34,7 @@ export default function OurStoryPage() {
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24">
           <div className="text-navy-900 text-base md:text-lg font-serif space-y-4">
             <p>
-              At Celebration of Life Concierge, we're here to help carry that burden. With empathy and experience, we support you through every step of planning a meaningful farewell, so you can focus on what matters most: remembering, grieving, and celebrating your loved one's life.
+              At Honoring Lifetimes, we're here to help carry that burden. With empathy and experience, we support you through every step of planning a meaningful farewell, so you can focus on what matters most: remembering, grieving, and celebrating your loved one's life.
             </p>
             <p>
               For over 30 years, we've helped families from all walks of life honor their loved ones through funerals, cremations, burials, and celebrations of life. We tailor each service to reflect the person's unique story, values, and cultural traditions.
@@ -55,7 +55,7 @@ export default function OurStoryPage() {
         <div className="max-w-4xl mx-auto mb-4">
           <h2 className="text-xl md:text-2xl font-serif font-bold text-navy-900 mb-2">Our Team</h2>
           <p className="text-base md:text-lg text-navy-900/80 mb-8 max-w-4xl">
-            Behind every memorable Celebration of Life is a dedicated Memorial Service Team, bringing together expertise, compassion, and a deep commitment to honor each unique life. At Celebration of Life Concierge, our team stands as the cornerstone of our service, adept at translating your loved one's stories and accomplishments into touching memorial ceremonies. Empathy and professionalism are at the heart of everything we do, ensuring that each Celebration of Life reflects the individuality and essence of those being remembered. Meet the exceptional individuals who make up our Memorial Service Team, each bringing their unique talents and heartfelt dedication to every service we provide.
+            Behind every memorable Celebration of Life is a dedicated Memorial Service Team, bringing together expertise, compassion, and a deep commitment to honor each unique life. At Honoring Lifetimes, our team stands as the cornerstone of our service, adept at translating your loved one's stories and accomplishments into touching memorial ceremonies. Empathy and professionalism are at the heart of everything we do, ensuring that each Celebration of Life reflects the individuality and essence of those being remembered. Meet the exceptional individuals who make up our Memorial Service Team, each bringing their unique talents and heartfelt dedication to every service we provide.
           </p>
           <div className="flex flex-col gap-10">
             {/* Blane Ellsworth */}
@@ -66,7 +66,7 @@ export default function OurStoryPage() {
               <div className="flex-1 text-navy-900">
                 <h3 className="text-xl md:text-2xl font-serif font-bold mb-2">Blane Ellsworth</h3>
                 <p className="text-sm md:text-lg font-serif mb-2">
-                  Blane Ellsworth established Celebration of Life Concierge recognizing a trend from traditionally religious funeral observances to more personal, meaningful, and affirming memorials. Recognized for creating Celebration of Life Services which genuinely honor each individual's values, accomplishments, personality and character, Blane Ellsworth possesses an empathetic skill for being comforting and consoling.
+                  Blane Ellsworth established Honoring Lifetimes recognizing a trend from traditionally religious funeral observances to more personal, meaningful, and affirming memorials. Recognized for creating Celebration of Life Services which genuinely honor each individual's values, accomplishments, personality and character, Blane Ellsworth possesses an empathetic skill for being comforting and consoling.
                 </p>
                 <p className="text-base md:text-lg font-serif">
                   Blane will hear you and compassionately coordinate and conduct celebration of life services evocative of how the person you love desires to be remembered.
@@ -81,7 +81,7 @@ export default function OurStoryPage() {
               <div className="flex-1 text-navy-900">
                 <h3 className="text-xl md:text-2xl font-serif font-bold mb-2">Leslie Redmayne</h3>
                 <p className="text-base md:text-lg font-serif mb-2">
-                  Leslie Redmayne-Titley has a long-established history in the event industry. After many years overseeing weddings, Leslie's planning expertise will be utilized as the Administrative Director of Celebration of Life Concierge.
+                  Leslie Redmayne-Titley has a long-established history in the event industry. After many years overseeing weddings, Leslie's planning expertise will be utilized as the Administrative Director of Honoring Lifetimes.
                 </p>
                 <p className="text-base md:text-lg font-serif mb-2">
                   Leslie compliments her organizational excellence with her compassionate heart and her attentive listening skills while providing assurances through her attention to detail.

@@ -76,6 +76,15 @@ export default function Navbar() {
           >
             CONTACT
           </Link>
+          <SignedOut>
+            <Link href="/login" tabIndex={0} aria-label="Call us at 707-226-5235" className="w-full sm:w-auto">
+                        <div className="px-6 py-4 bg-gradient-to-b from-white/0 to-white/30 rounded-[10px] outline outline-1 outline-offset-[-1px] outline-white/40 inline-flex justify-center items-center gap-2 w-full sm:w-auto">
+                          <div className="text-center justify-start text-white text-base font-semibold font-['Lora'] uppercase leading-[14px]">
+                            Login
+                          </div>
+                        </div>
+                      </Link>
+          </SignedOut>
           <SignedIn>
             <Link
               href="/dashboard"
@@ -85,9 +94,8 @@ export default function Navbar() {
             >
               DASHBOARD
             </Link>
-         
           </SignedIn>
-             <Link
+            <Link
             href="get-started"
             className="h-12 px-6 py-4 bg-gradient-to-b from-[#957748] to-[#ac8b57] rounded-[10px] outline outline-1 outline-offset-[-1px] outline-[#a89578] inline-flex justify-center items-center gap-2.5 transition-colors hover:brightness-110"
             tabIndex={0}

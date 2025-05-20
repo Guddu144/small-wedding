@@ -10,6 +10,8 @@ import toast, { Toaster } from "react-hot-toast";
 import PopupContent from "@/components/Dashboard/Venues/Popup/PopupContent";
 import Link from "next/link";
 import { SignInButton } from "@clerk/nextjs";
+import Image from "next/image";
+import VenueModal from "@/components/Dashboard/Venues/Popup/ViewMore";
 
 interface Venue {
   user_role: string;
@@ -42,6 +44,11 @@ const VenuesPage: React.FC<UserProps> = ({ userEmail }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
+  const [wishlist, setWishlist] = useState<string[]>([]);
+  const [favorites, setFavorites] = useState<{[key: string]: boolean}>({});
+  
   const router = useRouter();
   const fetchNewData = async () => {
     setLoading(true);
@@ -64,6 +71,13 @@ const VenuesPage: React.FC<UserProps> = ({ userEmail }) => {
     fetchNewData();
   }, []);
 
+  const toggleFavorite = async (id: string) => {
+    setFavorites(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+    await handleWishList(userEmail, id.toString());
+  };
   const filteredVenues = venues.filter((venue) => {
     const term = debouncedSearchTerm.toLowerCase();
     return (
@@ -110,10 +124,29 @@ const [open, setOpen] = useState(false);
     }
   };
 
+  const handleOpenModal = (venue: Venue) => {
+      setSelectedVenue(venue);
+      setIsModalOpen(true);
+    };
+  
+    const handleCloseModal = () => {
+      setIsModalOpen(false);
+    };
+  
+
   return (
     <main className="min-h-screen bg-[#f5f3ef]">
       {/* <Navbar /> */}
       {/* Hero Section */}
+      {selectedVenue && (
+              <VenueModal
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                venue={selectedVenue}
+                onAddToWishlist={() => handleWishList(userEmail, selectedVenue.venueId)}
+                isInWishlist={wishlist.includes(selectedVenue.venueId)}
+              />
+            )}
       
       <section className="relative h-[380px] md:h-[420px] flex items-center justify-center text-center overflow-hidden">
         <video
@@ -190,117 +223,89 @@ const [open, setOpen] = useState(false);
 
               <PopupContent open={open} setOpen={setOpen}/>
         {/* Venues Grid */}
-        {loading ? (
+        {
+        // loading ? (
+        //   <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        //     <div className="bg-white rounded-2xl border border-[#eae5da] shadow p-4 flex flex-col gap-2 items-start">
+        //       <div className="w-full h-56 bg-[#e6e6e6] rounded-[6px]"></div>
+        //       <div className="w-full h-4 bg-[#e6e6e6] rounded-[6px]"></div>
+        //       <div className="flex justify-between gap-4 w-full">
+        //         <div className="w-[120px] h-4 bg-[#e6e6e6] rounded-[6px]"></div>
+        //         <div className="w-[120px] h-4 bg-[#e6e6e6] rounded-[6px]"></div>
+        //       </div>
+        //       <div className="w-full h-4 bg-[#e6e6e6] rounded-[6px] mt-2"></div>
+        //       <div className="w-full h-4 bg-[#e6e6e6] rounded-[6px]"></div>
+
+        //       <div className="w-full h-6 bg-[#e6e6e6] rounded-[6px] mt-2"></div>
+        //     </div>
+
+        //     <div className="bg-white rounded-2xl border border-[#eae5da] shadow p-4 flex flex-col gap-2 items-start">
+        //       <div className="w-full h-56 bg-[#e6e6e6] rounded-[6px]"></div>
+        //       <div className="w-full h-4 bg-[#e6e6e6] rounded-[6px]"></div>
+        //       <div className="flex justify-between gap-4 w-full">
+        //         <div className="w-[120px] h-4 bg-[#e6e6e6] rounded-[6px]"></div>
+        //         <div className="w-[120px] h-4 bg-[#e6e6e6] rounded-[6px]"></div>
+        //       </div>
+        //       <div className="w-full h-4 bg-[#e6e6e6] rounded-[6px] mt-2"></div>
+        //       <div className="w-full h-4 bg-[#e6e6e6] rounded-[6px]"></div>
+
+        //       <div className="w-full h-6 bg-[#e6e6e6] rounded-[6px] mt-2"></div>
+        //     </div>
+        //   </div>
+        // ) :
+        (
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-white rounded-2xl border border-[#eae5da] shadow p-4 flex flex-col gap-2 items-start">
-              <div className="w-full h-56 bg-[#e6e6e6] rounded-[6px]"></div>
-              <div className="w-full h-4 bg-[#e6e6e6] rounded-[6px]"></div>
-              <div className="flex justify-between gap-4 w-full">
-                <div className="w-[120px] h-4 bg-[#e6e6e6] rounded-[6px]"></div>
-                <div className="w-[120px] h-4 bg-[#e6e6e6] rounded-[6px]"></div>
-              </div>
-              <div className="w-full h-4 bg-[#e6e6e6] rounded-[6px] mt-2"></div>
-              <div className="w-full h-4 bg-[#e6e6e6] rounded-[6px]"></div>
-
-              <div className="w-full h-6 bg-[#e6e6e6] rounded-[6px] mt-2"></div>
-            </div>
-
-            <div className="bg-white rounded-2xl border border-[#eae5da] shadow p-4 flex flex-col gap-2 items-start">
-              <div className="w-full h-56 bg-[#e6e6e6] rounded-[6px]"></div>
-              <div className="w-full h-4 bg-[#e6e6e6] rounded-[6px]"></div>
-              <div className="flex justify-between gap-4 w-full">
-                <div className="w-[120px] h-4 bg-[#e6e6e6] rounded-[6px]"></div>
-                <div className="w-[120px] h-4 bg-[#e6e6e6] rounded-[6px]"></div>
-              </div>
-              <div className="w-full h-4 bg-[#e6e6e6] rounded-[6px] mt-2"></div>
-              <div className="w-full h-4 bg-[#e6e6e6] rounded-[6px]"></div>
-
-              <div className="w-full h-6 bg-[#e6e6e6] rounded-[6px] mt-2"></div>
-            </div>
-          </div>
-        ) : (
-          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredVenues.map((item, idx) => (
-              <div
-                key={idx}
-                className="bg-white rounded-2xl border border-[#eae5da] shadow p-4 flex flex-col justify-between h-full items-center"
-              >
-                <div>
-                  <div className="w-full h-56 relative mb-4">
-                  <img
-                    src={item?.gallery[0]}
-                    alt={item?.venue_name}
-                    className="object-cover rounded-xl w-full h-full"
-                  />
-                </div>
-                <h3 className="text-xl font-serif font-bold text-navy-900 mb-2">
-                  {item?.venue_name}
-                </h3>
-                <div className="flex items-center gap-6 mb-2">
-                  <div className="flex items-center gap-1 text-navy-900 text-base">
-                    <svg
-                      className="w-5 h-5 text-[#a89578]"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <rect x="3" y="3" width="18" height="18" rx="2" />
-                      <path d="M9 9h6v6H9z" />
-                    </svg>
-                    {item?.address?.city}
-                  </div>
-                  <div className="flex items-center gap-1 text-navy-900 text-base">
-                    <svg
-                      className="w-5 h-5 text-[#a89578]"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <circle cx="12" cy="7" r="4" />
-                      <path d="M5.5 21a7.5 7.5 0 0 1 13 0" />
-                    </svg>
-                    {item?.phone_no}
-                  </div>
-                </div>
-                <p className="text-navy-900 text-base font-serif mb-6">
-                  {item?.description}
-                </p>
-                </div>
-                <div className="flex justify-between w-full gap-4">
-                  <button className="w-full px-6 py-4 bg-[#0c3e58] rounded-[10px] inline-flex justify-center items-center gap-2.5">
-                    <div className="text-center text-[#f2cc91] text-base font-medium font-['Lora'] uppercase leading-none">
-                      VIEW MORE
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => handleWishList(userEmail, item?.venueId)}
-                    className="font-medium text-center flex justify-center items-center text-red-600 cursor-pointer  rounded hover:underline text-[20px]"
-                  >
-                    <BiHeart />
-                  </button>
-                </div>
-              </div>
-            ))}
+            {filteredVenues.length > 0 ? (
+                        filteredVenues.map((venue) => (
+                          <div key={venue.venueId} className="border border-gray-200 rounded-lg overflow-hidden bg-white flex flex-col h-full">
+                            <div className="relative h-48">
+                              <Image 
+                                src={venue.gallery[0]}
+                                alt={venue.venue_name}
+                                fill
+                                className="object-cover"
+                              />
+                              {/* Heart icon in the corner */}
+                              <div className="absolute top-3 right-3 z-10">
+                                <button 
+                                  className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-colors"
+                                  onClick={() => toggleFavorite(venue.venueId)}
+                                  aria-label={favorites[venue.venueId] ? "Remove from favorites" : "Add to favorites"}
+                                >
+                                  <svg className={`w-5 h-5 ${favorites[venue.venueId] ? 'text-red-500' : 'text-gray-300'}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+                                  </svg>
+                                </button>
+                              </div>
+                            </div>
+                            <div className="p-4 flex flex-col flex-grow">
+                              <h3 className="text-[#0a3b5b] font-semibold text-xl mb-2">{venue.venue_name}</h3>
+                              <p className="text-gray-600 text-sm mb-3 line-clamp-3 overflow-hidden overflow-ellipsis">
+                                {venue.description}
+                              </p>
+                              <div className="flex items-center text-gray-500 mb-4">
+                                <svg className="w-5 h-5 mr-2 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                                </svg>
+                                <span className="text-sm">{venue.address.country}</span>
+                              </div>
+                              <div className="flex justify-between mt-auto">
+                                <button onClick={() => handleOpenModal(venue)} className="text-[#0a3b5b] font-medium text-sm border border-gray-200 rounded px-4 py-2 hover:bg-gray-100">
+                                  View More
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="col-span-full text-center py-8">
+                          <p className="text-[#0a3b5b] text-lg">No venues match your search criteria. Try adjusting your filters.</p>
+                        </div>
+                      )}
           </div>
         )}
       </section>
       <FooterSection />
-        <Toaster
-        position="bottom-right"
-        toastOptions={{
-          style: {
-            fontSize: "16px",
-            fontWeight: "600",
-            background: "#fff",
-            zIndex: "99999999",
-          },
-          duration: 5000,
-          removeDelay: 5000,
-        }}/>
     </main>
   );
 };

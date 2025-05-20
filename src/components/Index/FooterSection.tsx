@@ -20,7 +20,7 @@ export default function FooterSection() {
       <div className="relative z-10 w-full flex flex-col items-center">
         {/* Logo */}
         <div className="flex justify-center mb-8">
-          <Image src="/images/logos/logo.svg" alt="Celebration of Life Concierge" width={220} height={60} className="mx-auto" priority />
+          <Image src="/images/logos/logo.svg" alt="Honoring Lifetimes" width={220} height={60} className="mx-auto" priority />
         </div>
         {/* Navigation Links */}
         <nav className="flex flex-wrap justify-center items-center gap-4 md:gap-8 mb-8 mr-8">
@@ -33,7 +33,7 @@ export default function FooterSection() {
         {/* Copyright */}
         <div className="text-center w-full mt-4">
           <span className="text-white/40 text-base md:text-sm font-serif tracking-wide uppercase">
-            © 2025 CELEBRATION OF LIFE CONCIERGE | ALL RIGHTS RESERVED
+            © 2025 Honoring Lifetimes | ALL RIGHTS RESERVED
           </span>
         </div>
       </div>

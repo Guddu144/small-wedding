@@ -12,6 +12,8 @@ import { useDebounce } from "use-debounce";
 import { IoBookmarkOutline } from "react-icons/io5";
 import Image from "next/image";
 import { Heart } from "lucide-react";
+import { useClerk } from "@clerk/nextjs";
+import VenueModal from "../Venues/Popup/ViewMore";
 export interface Venue {
   user_role: string;
   venueId: string;
@@ -40,6 +42,7 @@ interface UserProps {
 }
 
 const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
+  const { signOut } = useClerk();
   const [venues, setVenues] = useState<Venue[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -48,7 +51,10 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
   const [activeTab, setActiveTab] = useState('venue');
   const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
   const router = useRouter();
-  const [favorites, setFavorites] = useState<{[key: number]: boolean}>({});
+  const [favorites, setFavorites] = useState<{[key: string]: boolean}>({});
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
+  const [wishlist, setWishlist] = useState<string[]>([]);
 
   const fetchNewData = async () => {
     setLoading(true);
@@ -71,19 +77,11 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
     fetchNewData();
   }, []);
 
-  const handleLogout = () => {
-    localStorage.clear();
-    sessionStorage.clear();
+    const handleLogout = () => {
+      signOut(() => router.push('/'));
+    };
 
-    document.cookie.split(";").forEach((cookie) => {
-      const name = cookie.split("=")[0].trim();
-      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
-    });
-
-    router.push('/');
-  };
-
-  const toggleFavorite = async (id: number) => {
+  const toggleFavorite = async (id: string) => {
     setFavorites(prev => ({
       ...prev,
       [id]: !prev[id]
@@ -112,7 +110,9 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
         toast.success("Venue added to Wishlist!");
         router.refresh();
       } else {
-        toast.error("This venue is already added!");
+      const errorMessage = data.apiError?.error || data.error || "Failed to update wishlist";
+      toast.error(errorMessage);
+      return;
       }
     } catch (error) {
       console.error("Post error:", error);
@@ -137,15 +137,34 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
     setSearchTerm(e.target.value);
   };
 
+  const handleOpenModal = (venue: Venue) => {
+    setSelectedVenue(venue);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
+      {selectedVenue && (
+        <VenueModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          venue={selectedVenue}
+          onAddToWishlist={() => handleWishList(userEmail, selectedVenue.venueId)}
+          isInWishlist={wishlist.includes(selectedVenue.venueId)}
+        />
+      )}
       <header className="bg-[#0a3b5b] text-white px-3 py-3">
         <div className="container mx-auto flex justify-between items-center">
           <div>
             <Image 
               src="/images/logos/logo.svg" 
-              alt="Celebration of Life Concierge" 
+              alt="Honoring Lifetimes" 
               width={200} 
               height={50}
               priority
@@ -242,7 +261,7 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
           {/* Venue Cards */}
           {filteredVenues.length > 0 ? (
             filteredVenues.map((venue) => (
-              <div key={venue.venueId} className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+              <div key={venue.venueId} className="border border-gray-200 rounded-lg overflow-hidden bg-white flex flex-col h-full">
                 <div className="relative h-48">
                   <Image 
                     src={venue.gallery[0]}
@@ -254,16 +273,16 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
                   <div className="absolute top-3 right-3 z-10">
                     <button 
                       className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-colors"
-                      onClick={() => toggleFavorite(Number(venue.venueId))}
-                      aria-label={favorites[Number(venue.venueId)] ? "Remove from favorites" : "Add to favorites"}
+                      onClick={() => toggleFavorite(venue.venueId)}
+                      aria-label={favorites[venue.venueId] ? "Remove from favorites" : "Add to favorites"}
                     >
-                      <svg className={`w-5 h-5 ${favorites[Number(venue.venueId)] ? 'text-red-500' : 'text-gray-300'}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <svg className={`w-5 h-5 ${favorites[venue.venueId] ? 'text-red-500' : 'text-gray-300'}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
                       </svg>
                     </button>
                   </div>
                 </div>
-                <div className="p-4">
+                <div className="p-4 flex flex-col flex-grow">
                   <h3 className="text-[#0a3b5b] font-semibold text-xl mb-2">{venue.venue_name}</h3>
                   <p className="text-gray-600 text-sm mb-3 line-clamp-3 overflow-hidden overflow-ellipsis">
                     {venue.description}
@@ -274,9 +293,11 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
                     </svg>
                     <span className="text-sm">{venue.address.country}</span>
                   </div>
-                  <button className="w-full text-[#0a3b5b] font-medium text-sm border border-gray-200 rounded px-4 py-2 hover:bg-gray-100">
-                    View More
-                  </button>
+                  <div className="flex justify-between mt-auto">
+                    <button onClick={() => handleOpenModal(venue)} className="text-[#0a3b5b] font-medium text-sm border border-gray-200 rounded px-4 py-2 hover:bg-gray-100">
+                      View More
+                    </button>
+                  </div>
                 </div>
               </div>
             ))

@@ -58,7 +58,7 @@ export default function ServicesSection() {
       <div className="max-w-6xl mx-auto relative z-10 px-4 md:px-0">
         <h2 className="text-xl sm:text-2xl md:text-2xl font-serif font-semibold text-white mb-2 text-left">Our Services</h2>
         <p className="text-sm sm:text-base md:text-lg text-white/80 mb-10 text-left max-w-2xl">
-          At Celebration of Life Concierge, every detail is an opportunity to honor a life well-lived. Whether you need end-to-end support or just a few key elements, our team crafts each service with compassion, expertise, and a deeply personal touch.
+          At Honoring Lifetimes, every detail is an opportunity to honor a life well-lived. Whether you need end-to-end support or just a few key elements, our team crafts each service with compassion, expertise, and a deeply personal touch.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
           {services.map((service) => (

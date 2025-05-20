@@ -82,10 +82,10 @@ const Sidebar: React.FC<SidebarProps> = ({ children, userRole }) => {
                   />
                 </svg>
               </button>
-              <Link className="bg-[#000]" href="/" aria-label="Celebration of Life Concierge">
+              <Link className="bg-[#000]" href="/" aria-label="Honoring Lifetimes">
                 <Image
                   src="/images/logos/logo.svg"
-                  alt="Celebration of Life Concierge"
+                  alt="Honoring Lifetimes"
                   width={200}
                   height={50}
                   priority

@@ -73,7 +73,7 @@ export default function ServicesPage() {
         <div className="relative z-20 max-w-3xl mx-auto px-4">
           <h1 className="text-2xl md:text-4xl font-serif font-bold text-white mb-4 mt-16">SERVICES</h1>
           <p className="text-base md:text-md text-white/90 max-w-2xl mx-auto">
-            At Celebration of Life Concierge, we understand that saying goodbye is a deeply personal affair, and the way it's conducted should reflect the unique life it commemorates. We are here to ensure that every aspect of the celebration is managed with dignity, respect, and a personal touch that honors the memory of your loved one. Whether you require comprehensive support or select services, we are committed to tailoring a package that best serves your needs and fits the wishes of the departed.
+            At Honoring Lifetimes, we understand that saying goodbye is a deeply personal affair, and the way it's conducted should reflect the unique life it commemorates. We are here to ensure that every aspect of the celebration is managed with dignity, respect, and a personal touch that honors the memory of your loved one. Whether you require comprehensive support or select services, we are committed to tailoring a package that best serves your needs and fits the wishes of the departed.
           </p>
         </div>
       </section>
