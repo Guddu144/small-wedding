@@ -27,14 +27,14 @@ export async function DELETE(request: Request) {
     );
 
     if (!response.ok) {
-      throw new Error(`Failed to delete venue data: ${response.statusText}`);
+      throw new Error(`Failed to remove venue from wishlist: ${response.statusText}`);
     }
 
     return NextResponse.json({ message: "Venue deleted successfully" });
   } catch (error: any) {
     console.error("Error deleting venue:", error.message);
     return NextResponse.json(
-      { error: "Failed to delete venue data" },
+      { error: "Failed to remove venue from wishlist" },
       { status: 500 }
     );
   }
