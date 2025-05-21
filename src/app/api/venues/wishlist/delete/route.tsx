@@ -13,7 +13,7 @@ export async function DELETE(request: Request) {
     }
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_VENUE_URL}/wishlist/${venueId}`,
+      `${process.env.NEXT_PUBLIC_API_VENUE_URL}/wishlist/delete`,
       {
         method: "DELETE",
         headers: {

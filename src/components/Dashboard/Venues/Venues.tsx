@@ -37,6 +37,15 @@ interface UserProps {
   userEmail: string;
 }
 
+
+  export const isValidImageUrl = (url: any) => {
+  if (typeof url !== "string" || url.trim() === "") return false;
+  if (url.startsWith("http://") || url.startsWith("https://")) return true;
+  if (url.startsWith("/")) return true; // from public folder
+  return false;
+};
+
+
 const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
   const { signOut } = useClerk();
   const [venues, setVenues] = useState<Venue[]>([]);
@@ -277,8 +286,15 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
             ADD NEW VENUE
           </button>
         </div>
-
+        
+        {/* Loading state */}
+        {loading && (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0a3b5b]"></div>
+          </div>
+        )}
         {/* Venues Grid */}
+        {!loading && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-6 pb-8">
           {/* New Venue Card */}
           <div 
@@ -298,13 +314,19 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
             filteredVenues.map((venue) => (
               <div key={venue.venueId} className="border border-gray-200 rounded-lg overflow-hidden bg-white flex flex-col h-full">
                 <div className="relative h-48">
-                  <Image 
+                {isValidImageUrl(venue.gallery[0]) ? (
+                  <Image
                     src={venue.gallery[0]}
                     alt={venue.venue_name}
                     fill
                     className="object-cover"
                   />
-                  {/* Heart icon in the corner */}
+                ) : (
+                  <div className="w-full h-full bg-gray-200 flex items-center justify-center text-sm text-gray-500">
+                    No image available
+                  </div>
+                )}
+                                  {/* Heart icon in the corner */}
                   {/* <div className="absolute top-3 right-3 z-10">
                     <button 
                       className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-colors"
@@ -359,6 +381,7 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
             </div>
           )}
         </div>
+        )}
       </main>
       <AddVenueForm value={selectedVenue} fetchNewData={fetchNewData}  drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} formstate={formstate} userRole={userRole} userEmail={userEmail}/>
     </div>

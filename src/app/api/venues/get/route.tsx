@@ -11,7 +11,7 @@ export async function GET(request:Request) {
     const url = new URL(request.url);
     const userId = url.searchParams.get("user_id");
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_VENUE_URL}/venues?limit=25&start_key=0&user_id=${userId}`,
+      `${process.env.NEXT_PUBLIC_API_VENUE_URL}/venues?limit=500&start_key=0&user_id=${userId}`,
       reqOptions
     );
     if (!response.ok) {

@@ -14,6 +14,7 @@ import Image from "next/image";
 import { Heart } from "lucide-react";
 import { useClerk } from "@clerk/nextjs";
 import VenueModal from "../Venues/Popup/ViewMore";
+import { isValidImageUrl } from "../Venues/Venues";
 export interface Venue {
   user_role: string;
   venueId: string;
@@ -293,6 +294,16 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail, userId }) => {
                 </span>
               )}
             </div>
+            {/* <div className="relative">
+              <svg className="w-5 h-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+              </svg>
+              {venues.filter(v => v.is_wishlist).length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center transform transition-all duration-200 scale-100 hover:scale-110">
+                  {venues.filter(v => v.is_wishlist).length}
+                </span>
+              )}
+            </div> */}
             <div className="w-8 h-8 bg-[#a89578] rounded-full flex items-center justify-center text-white">
               <span>P</span>
             </div>
@@ -374,21 +385,31 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail, userId }) => {
             </div>
           </div>
         </div>
-
+        {loading && (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0a3b5b]"></div>
+          </div>
+        )}
         {/* Venues Grid */}
+        {!loading && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-6 pb-8">
           {/* Venue Cards */}
           {filteredVenues.length > 0 ? (
             filteredVenues.map((venue) => (
               <div key={venue.venueId} className="border border-gray-200 rounded-lg overflow-hidden bg-white flex flex-col h-full">
                 <div className="relative h-48">
-                  <Image 
-                    src={venue.gallery[0]}
-                    alt={venue.venue_name}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 1200px"
-                    className="object-cover"
-                  />
+                  {isValidImageUrl(venue.gallery[0]) ? (
+                                    <Image
+                                      src={venue.gallery[0]}
+                                      alt={venue.venue_name}
+                                      fill
+                                      className="object-cover"
+                                    />
+                                  ) : (
+                                    <div className="w-full h-full bg-gray-200 flex items-center justify-center text-sm text-gray-500">
+                                      No image available
+                                    </div>
+                                  )}
                   {/* Heart icon in the corner */}
                   <div className="absolute top-3 right-3 z-10">
                     <button 
@@ -432,6 +453,7 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail, userId }) => {
             </div>
           )}
         </div>
+        )}
       </main>
     </div>
   );
