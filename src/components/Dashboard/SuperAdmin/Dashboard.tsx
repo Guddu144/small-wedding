@@ -12,7 +12,7 @@ import VenueReassignments from './components/VenueReassignments';
 import VenuesManagement from './components/VenuesManagement';
 import { useClerk } from '@clerk/nextjs';
 
-export default function SuperAdminDashboard() {
+export default function SuperAdminDashboard({ userRole }: { userRole: string }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('pending-venues');
   const [dropdownOpen, setDropdownOpen] = useState(false);
