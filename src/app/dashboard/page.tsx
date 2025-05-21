@@ -4,11 +4,12 @@ import RegisterUser from "../../components/Dashboard/Users/CRUD/RegisterUser";
 import Venues from "@/components/Dashboard/Venues/Venues";
 import UserManagement from "@/components/Dashboard/Users/UserManagement";
 import UserDashboard from "@/components/Dashboard/Users/UserDashboard";
+import SuperAdminDashboard from "@/components/Dashboard/SuperAdmin/Dashboard";
 
 
 const page = async() => {
   const user= await currentUser()
-
+console.log(user,'user')
     const userRole= user?.unsafeMetadata?.userRole as string;
     const userEmail=user?.emailAddresses[0]?.emailAddress as string;
     const userId=user?.id as string;
@@ -20,12 +21,18 @@ const page = async() => {
   </span>
 </h1> */}
 {/* <RegisterUser/> */}
-  {
-    userRole==="venueowner"? 
-    <Venues userRole={userRole} userEmail={userEmail}/>:
-    <UserDashboard userEmail={userEmail} userRole={userRole} userId={userId}/>
-  }
-  </>;
+      {userRole === "venueowner" ? (
+        <Venues userRole={userRole} userEmail={userEmail} />
+      ) : userRole === "superadmin" ? (
+        <SuperAdminDashboard  />
+      ) : (
+        <UserDashboard
+          userEmail={userEmail}
+          userRole={userRole}
+          userId={userId}
+        />
+      )}
+    </>
 };
 
 export default page;

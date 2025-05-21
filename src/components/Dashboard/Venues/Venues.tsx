@@ -65,7 +65,7 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
   const fetchNewData = async () => {
     setLoading(true);
     try {
-      const fetchData = await fetchGetVenueData();
+      const fetchData = await fetchGetVenueData(1,500,userEmail,userRole);
       const sortedVenues = fetchData.result.venues.sort(
         (a: Venue, b: Venue) =>
           new Date(b.created_date).getTime() -

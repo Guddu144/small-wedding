@@ -13,9 +13,9 @@ export const fetchOfficeData = async () => {
     }
   };
 
-export const fetchGetVenueData = async (page = 1, limit = 9,userId?:string) => {
+export const fetchGetVenueData = async (page = 1, limit = 9,userId?:string,userRole?:string) => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/venues/get?start=0&page=${page}&limit=${limit}&user_id=${userId}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/venues/get?start=0&page=${page}&limit=${limit}&user_id=${userId}&user_role=${userRole}`, {
       headers: {
         "Content-Type": "application/json",
       },
