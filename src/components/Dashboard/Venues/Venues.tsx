@@ -30,6 +30,7 @@ export interface Venue {
   description: string;
   venue_type: string;
   created_date: string;
+  status?: string;
 }
 
 interface UserProps {

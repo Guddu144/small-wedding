@@ -24,7 +24,7 @@ console.log(user,'user')
       {userRole === "venueowner" ? (
         <Venues userRole={userRole} userEmail={userEmail} />
       ) : userRole === "superadmin" ? (
-        <SuperAdminDashboard userRole={userRole} />
+        <SuperAdminDashboard userRole={userRole} userEmail={userEmail} />
       ) : (
         <UserDashboard
           userEmail={userEmail}

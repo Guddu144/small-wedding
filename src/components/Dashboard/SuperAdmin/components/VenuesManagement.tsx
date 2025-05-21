@@ -1,68 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { fetchGetVenueData } from '../../../../../utils/dashboard';
+import { isValidImageUrl, Venue } from '../../Venues/Venues';
+import Image from 'next/image';
+import toast from 'react-hot-toast';
 
-type Venue = {
-  id: number;
-  name: string;
-  description: string;
-  address: string;
-  image: string;
-  ownerName: string;
-  ownerEmail: string;
-  status: 'active' | 'inactive';
-  createdAt: string;
-};
 
-export default function VenuesManagement() {
+export default function VenuesManagement({ userEmail }: { userEmail: string }) {
   const router = useRouter();
-  const [venues, setVenues] = useState<Venue[]>([
-    {
-      id: 1,
-      name: 'Vineyard Deck',
-      description: 'Exchange vows or entertain guests while enjoying stellar valley views from this alluring outdoor wedding.',
-      address: '306-282 Maple Ave',
-      image: '/images/venues/image-1.jpg',
-      ownerName: 'John Smith',
-      ownerEmail: 'john@example.com',
-      status: 'active',
-      createdAt: '2023-10-15'
-    },
-    {
-      id: 2,
-      name: 'Mountain View Retreat',
-      description: 'Peaceful sanctuary nestled in the mountains with panoramic views and natural surroundings.',
-      address: '456 Mountain Ridge Rd, Hillside',
-      image: '/images/venues/image-1.jpg',
-      ownerName: 'Sarah Johnson',
-      ownerEmail: 'sarah@example.com',
-      status: 'active',
-      createdAt: '2023-11-20'
-    },
-    {
-      id: 3,
-      name: 'Seaside Memorial Center',
-      description: 'Elegant waterfront venue perfect for memorial services with ocean views.',
-      address: '789 Coastal Hwy, Beachtown',
-      image: '/images/venues/image-1.jpg',
-      ownerName: 'Michael Davis',
-      ownerEmail: 'michael@example.com',
-      status: 'active',
-      createdAt: '2023-11-05'
-    },
-    {
-      id: 4,
-      name: 'River View Halls',
-      description: 'A serene venue overlooking the beautiful river with spacious halls for gatherings.',
-      address: '123 Riverside Dr, Riverdale',
-      image: '/images/venues/image-1.jpg',
-      ownerName: 'Emily Wilson',
-      ownerEmail: 'emily@example.com',
-      status: 'inactive',
-      createdAt: '2023-12-01'
-    }
-  ]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [venues, setVenues] = useState<Venue[]>([]);
 
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -74,6 +23,27 @@ export default function VenuesManagement() {
     address: '',
     status: 'active' as 'active' | 'inactive'
   });
+
+  const fetchNewData = async () => {
+      setLoading(true);
+      try {
+        const fetchData = await fetchGetVenueData(1,500,userEmail,'superadmin');
+        const sortedVenues = fetchData.result.venues.sort(
+          (a: Venue, b: Venue) =>
+            new Date(b.created_date).getTime() -
+            new Date(a.created_date).getTime()
+        );
+        setVenues(sortedVenues);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+  useEffect(() => {
+      fetchNewData();
+    }, []);
 
   // Handle add new venue
   const handleAddNewVenue = () => {
@@ -98,42 +68,74 @@ export default function VenuesManagement() {
   // Open edit modal
   const handleEditVenue = (venue: Venue) => {
     setCurrentVenue(venue);
-    setFormData({
-      name: venue.name,
-      description: venue.description,
-      address: venue.address,
-      status: venue.status
-    });
+    // setFormData({
+    //   name: venue.name,
+    //   description: venue.description,
+    //   address: venue.address,
+    //   status: venue.status
+    // });
     setIsEditModalOpen(true);
   };
 
-  // Open delete confirmation modal
   const handleDeleteClick = (venue: Venue) => {
-    setCurrentVenue(venue);
-    setIsDeleteModalOpen(true);
-  };
+  setCurrentVenue(venue);
+  setIsDeleteModalOpen(true);
+};
+
+const handleConfirmDelete = async () => {
+  if (currentVenue) {
+    try {
+      await deleteVenue(currentVenue.venueId);
+      await fetchNewData();
+      setIsDeleteModalOpen(false);
+      toast.success("Venue deleted successfully!");
+    } catch (error) {
+      toast.error("Failed to delete venue");
+      console.error(error);
+    }
+  }
+};
 
   // Submit form for editing a venue
   const handleSubmitEdit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (currentVenue) {
-      setVenues(venues.map(venue => 
-        venue.id === currentVenue.id 
-          ? { ...venue, ...formData } 
-          : venue
-      ));
+    // if (currentVenue) {
+    //   setVenues(venues.map(venue => 
+    //     venue.id === currentVenue.id 
+    //       ? { ...venue, ...formData } 
+    //       : venue
+    //   ));
       setIsEditModalOpen(false);
     }
-  };
 
-  // Delete venue
-  const handleDeleteVenue = () => {
-    if (currentVenue) {
-      setVenues(venues.filter(venue => venue.id !== currentVenue.id));
-      setIsDeleteModalOpen(false);
-    }
-  };
+  const deleteVenue = async (venue_id: string) => {
+      setLoading(true);
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_URL}/api/venues/delete?venue_id=${venue_id}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            next: { revalidate: 0 },
+            body: JSON.stringify({
+              venue_id: venue_id,
+              user_role: 'superadmin',
+            }),
+          }
+        );
+  
+        if (res.ok) {
+          toast.success("Venue Delete Successfully!");
+        }
+      } catch (error) {
+        console.error("Delete error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
   // Get status badge class
   const getStatusBadgeClass = (status: 'active' | 'inactive') => {
@@ -157,28 +159,37 @@ export default function VenuesManagement() {
           ADD NEW VENUE
         </button>
       </div>
+      {loading && (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0a3b5b]"></div>
+          </div>
+        )}
 
       {/* Venues Grid */}
+      {!loading && (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {venues.map((venue) => (
-          <div key={venue.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="relative">
-              <img 
-                src={venue.image} 
-                alt={venue.name}
-                className="w-full h-48 object-cover"
-              />
-              <div className="absolute top-2 right-2 bg-white/70 backdrop-blur-sm rounded-full p-1 shadow-sm">
-                <span className={`px-2 py-1 rounded-full text-xs ${getStatusBadgeClass(venue.status)}`}>
-                  {venue.status === 'active' ? 'Active' : 'Inactive'}
-                </span>
-              </div>
+          <div key={venue.venueId} className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="relative h-48 w-full"> 
+          {isValidImageUrl(venue?.gallery[0]) ? (
+            <Image
+              src={venue.gallery[0]}
+              alt={venue.venue_name}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-200 flex items-center justify-center text-sm text-gray-500">
+              No image available
             </div>
+          )}
+        </div>
             <div className="p-4">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-lg font-medium text-[#0a3b5b]">{venue.name}</h3>
-                  <p className="text-sm text-gray-500 mt-1">Owner: {venue.ownerName}</p>
+                  <h3 className="text-lg font-medium text-[#0a3b5b]">{venue.venue_name}</h3>
+                  <p className="text-sm text-gray-500 mt-1">Owner: {venue.venue_user}</p>
                 </div>
                 <div className="flex">
                   <button 
@@ -213,12 +224,13 @@ export default function VenuesManagement() {
                 <svg className="w-4 h-4 mr-1 text-[#957748]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                 </svg>
-                <span className="text-sm">{venue.address}</span>
+                <span className="text-sm">{venue.address.country}</span>
               </div>
             </div>
           </div>
         ))}
       </div>
+      )}
 
       {/* View Venue Modal */}
       {isViewModalOpen && currentVenue && (
@@ -240,34 +252,42 @@ export default function VenuesManagement() {
             <div className="px-6 py-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <img 
-                    src={currentVenue.image} 
-                    alt={currentVenue.name}
-                    className="w-full h-64 object-cover rounded-lg"
-                  />
+                {isValidImageUrl(currentVenue?.gallery[0]) ? (
+                                <Image
+                                  src={currentVenue.gallery[0]}
+                                  alt={currentVenue.venue_name}
+                                  fill
+                                  className="object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full bg-gray-200 flex items-center justify-center text-sm text-gray-500">
+                                  No image available
+                                </div>
+                              )}
+                  
                 </div>
                 <div>
                   <div className="flex justify-between items-start mb-4">
-                    <h4 className="text-xl font-medium text-[#0a3b5b]">{currentVenue.name}</h4>
-                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusBadgeClass(currentVenue.status)}`}>
-                      {currentVenue.status === 'active' ? 'Active' : 'Inactive'}
+                    <h4 className="text-xl font-medium text-[#0a3b5b]">{currentVenue.venue_name }</h4>
+                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusBadgeClass(currentVenue?.status?'active':'inactive')}`}>
+                      {currentVenue?.status === 'active' ? 'Active' : 'Inactive'}
                     </span>
                   </div>
                   
                   <div className="mb-4">
                     <p className="text-sm font-medium text-gray-500">Owner</p>
-                    <p className="text-[#0a3b5b]">{currentVenue.ownerName}</p>
-                    <p className="text-sm text-gray-600">{currentVenue.ownerEmail}</p>
+                    <p className="text-[#0a3b5b]">{currentVenue.venue_user}</p>
+                    <p className="text-sm text-gray-600">{currentVenue.email}</p>
                   </div>
                   
                   <div className="mb-4">
                     <p className="text-sm font-medium text-gray-500">Address</p>
-                    <p className="text-[#0a3b5b]">{currentVenue.address}</p>
+                    <p className="text-[#0a3b5b]">{currentVenue.address.country}</p>
                   </div>
                   
                   <div className="mb-4">
                     <p className="text-sm font-medium text-gray-500">Date Added</p>
-                    <p className="text-[#0a3b5b]">{new Date(currentVenue.createdAt).toLocaleDateString()}</p>
+                    <p className="text-[#0a3b5b]">{new Date(currentVenue.created_date).toLocaleDateString()}</p>
                   </div>
                 </div>
               </div>
@@ -364,7 +384,7 @@ export default function VenuesManagement() {
                 
                 <div className="mb-4">
                   <p className="text-sm font-medium text-gray-700 mb-1">Current Owner</p>
-                  <p className="text-[#0a3b5b]">{currentVenue.ownerName} ({currentVenue.ownerEmail})</p>
+                  <p className="text-[#0a3b5b]">{currentVenue.venue_user} ({currentVenue.email})</p>
                 </div>
               </div>
               <div className="px-6 py-3 border-t border-gray-200 flex justify-end gap-3">
@@ -401,7 +421,7 @@ export default function VenuesManagement() {
               </div>
               <h3 className="text-lg font-medium text-gray-900 text-center mb-2">Delete Venue</h3>
               <p className="text-sm text-gray-500 text-center">
-                Are you sure you want to delete {currentVenue.name}? This action cannot be undone and will remove all associated data.
+                Are you sure you want to delete {currentVenue.venue_name}? This action cannot be undone and will remove all associated data.
               </p>
             </div>
             <div className="px-6 py-3 border-t border-gray-200 flex justify-end gap-3">
@@ -414,7 +434,7 @@ export default function VenuesManagement() {
               </button>
               <button
                 type="button"
-                onClick={handleDeleteVenue}
+                onClick={handleConfirmDelete}
                 className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
               >
                 Delete
