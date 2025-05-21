@@ -10,17 +10,20 @@ import UsersManagement from './components/UsersManagement';
 import EnquiriesManagement from './components/EnquiriesManagement';
 import VenueReassignments from './components/VenueReassignments';
 import VenuesManagement from './components/VenuesManagement';
+import { useClerk } from '@clerk/nextjs';
 
 export default function SuperAdminDashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('pending-venues');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { signOut } = useClerk();
+  
 
   // Handle logout
   const handleLogout = () => {
-    router.push('/');
-  };
+      signOut(() => router.push('/'));
+    };
 
   // Close dropdown when clicking outside
   useEffect(() => {
