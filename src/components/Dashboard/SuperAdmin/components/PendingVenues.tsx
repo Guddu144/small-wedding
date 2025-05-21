@@ -1,60 +1,66 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { fetchPendingVenues } from '../../../../../utils/dashboard';
+import { isValidImageUrl, Venue } from '../../Venues/Venues';
 import Image from 'next/image';
+import toast from 'react-hot-toast';
 
-type PendingVenue = {
-  id: number;
-  name: string;
-  description: string;
-  address: string;
-  image: string;
-  ownerName: string;
-  submittedDate: string;
-};
+
 
 export default function PendingVenues() {
-  const [pendingVenues, setPendingVenues] = useState<PendingVenue[]>([
-    {
-      id: 1,
-      name: 'River View Halls',
-      description: 'A serene venue overlooking the beautiful river with spacious halls for gatherings.',
-      address: '123 Riverside Dr, Riverdale',
-      image: '/images/venues/image-1.jpg',
-      ownerName: 'John Smith',
-      submittedDate: '2023-12-10'
-    },
-    {
-      id: 2,
-      name: 'Mountain View Retreat',
-      description: 'Peaceful sanctuary nestled in the mountains with panoramic views and natural surroundings.',
-      address: '456 Mountain Ridge Rd, Hillside',
-      image: '/images/venues/image-1.jpg',
-      ownerName: 'Sarah Johnson',
-      submittedDate: '2023-12-15'
-    },
-    {
-      id: 3,
-      name: 'Seaside Memorial Center',
-      description: 'Elegant waterfront venue perfect for memorial services with ocean views.',
-      address: '789 Coastal Hwy, Beachtown',
-      image: '/images/venues/image-1.jpg',
-      ownerName: 'Michael Davis',
-      submittedDate: '2023-12-18'
+  const [pendingVenues, setPendingVenues] = useState<Venue[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchNewData = async () => {
+      try {
+        const fetchData = await fetchPendingVenues()
+        
+          setPendingVenues(fetchData.result.pending_venues || []);
+          setLoading(false);
+      }catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
-  ]);
+    };
 
-  // Handle venue approval
-  const handleApproveVenue = (id: number) => {
-    // Here you would call an API to approve the venue
-    setPendingVenues(pendingVenues.filter(venue => venue.id !== id));
-    alert(`Venue ID: ${id} has been approved`);
-  };
+    fetchNewData();
+  }, []);
 
+
+  const handleApproveVenue = async (id: string) => {
+  try {
+    const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/venues/acceptvenue/post`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            venueId: id,
+            user_role: 'superadmin'
+          }),
+        }
+      );
+    if (!response.ok) {
+      throw new Error('Failed to approve the venue');
+    }
+
+    const result = await response.json();
+
+    setPendingVenues(prev => prev.filter(venue => venue.venueId !== id));
+
+    toast.success('Venue approved successfully!');
+  } catch (error) {
+    console.error(error);
+    alert('There was an error approving the venue.');
+  }
+};
   // Handle venue rejection
-  const handleRejectVenue = (id: number) => {
+  const handleRejectVenue = (id: string) => {
     // Here you would call an API to reject the venue
-    setPendingVenues(pendingVenues.filter(venue => venue.id !== id));
+    setPendingVenues(pendingVenues?.filter(venue => venue.venueId !== id));
     alert(`Venue ID: ${id} has been rejected`);
   };
 
@@ -65,34 +71,40 @@ export default function PendingVenues() {
         <h1 className="text-2xl font-serif text-[#0a3b5b]">PENDING VENUE LISTINGS</h1>
       </div>
 
-      {pendingVenues.length === 0 ? (
+      {pendingVenues?.length === 0 ? (
         <div className="bg-white p-6 rounded-lg shadow-md text-center">
           <p className="text-lg text-gray-600">No pending venues to approve</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6">
-          {pendingVenues.map((venue) => (
-            <div key={venue.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+          {pendingVenues?.map((venue) => (
+            <div key={venue.venueId} className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="flex flex-col md:flex-row">
                 <div className="md:w-1/3 relative">
-                  <img 
-                    src={venue.image} 
-                    alt={venue.name}
-                    className="w-full h-full object-cover object-center"
-                    style={{ minHeight: '200px' }}
-                  />
+                   {isValidImageUrl(venue.gallery[0]) ? (
+                                     <Image
+                                       src={venue.gallery[0]}
+                                       alt={venue.venue_name}
+                                       fill
+                                       className="object-cover"
+                                     />
+                                   ) : (
+                                     <div className="w-full h-full bg-gray-200 flex items-center justify-center text-sm text-gray-500">
+                                       No image available
+                                     </div>
+                                   )}
                 </div>
                 <div className="md:w-2/3 p-6">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h2 className="text-xl font-medium text-[#0a3b5b]">{venue.name}</h2>
+                      <h2 className="text-xl font-medium text-[#0a3b5b]">{venue.venue_name}</h2>
                       <p className="text-sm text-gray-500 mb-2">
-                        Submitted by: {venue.ownerName} on {new Date(venue.submittedDate).toLocaleDateString()}
+                        Submitted by: {venue.venue_user} on {new Date(venue.created_date).toLocaleDateString()}
                       </p>
                     </div>
                     <div className="flex gap-2">
                       <button 
-                        onClick={() => handleApproveVenue(venue.id)}
+                        onClick={() => handleApproveVenue(venue.venueId)}
                         className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center gap-1"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -101,7 +113,7 @@ export default function PendingVenues() {
                         Approve
                       </button>
                       <button 
-                        onClick={() => handleRejectVenue(venue.id)}
+                        onClick={() => handleRejectVenue(venue.venueId)}
                         className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 flex items-center gap-1"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -118,7 +130,7 @@ export default function PendingVenues() {
                     <svg className="w-4 h-4 mr-1 text-[#957748]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                     </svg>
-                    <span className="text-sm">{venue.address}</span>
+                    <span className="text-sm">{venue.address.country}</span>
                   </div>
                   
                   <div className="mt-4">
