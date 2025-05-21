@@ -19,24 +19,32 @@ export default function LoginPage() {
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!isLoaded) return;
+  e.preventDefault();
+  if (!isLoaded) return;
+  
+  setIsSubmitting(true);
+  try {
+    const result = await signIn.create({ 
+      identifier: emailAddress, 
+      password 
+    });
 
-    try {
-      const result = await signIn.create({ identifier:emailAddress, password });
-
-      if (result.status === 'complete') {
-        await setActive({ session: result.createdSessionId });
-        router.push('/dashboard');
-      } else {
-        console.log(result);
-      }
-    } catch (err: any) {
-      setError(err.errors[0]?.longMessage || 'Sign-in failed');
+    if (result.status === 'complete') {
+      await setActive({ session: result.createdSessionId });
+      router.push('/dashboard');
+    } else {
+      console.log(result);
     }
-  };
+  } catch (err: any) {
+    setError(err.errors[0]?.longMessage || 'Sign-in failed');
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   // Auto-rotate images every 2 seconds
   useEffect(() => {
@@ -110,7 +118,7 @@ export default function LoginPage() {
                   </div>
                   <div className="relative">
                     <input 
-                      type="password" 
+                      type={showPassword? 'text' : 'password'}
                       id="password" 
                       placeholder="enter ..." 
                       className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:border-[#a89578]"
@@ -123,6 +131,7 @@ export default function LoginPage() {
                       type="button"
                       className="absolute inset-y-0 right-0 pr-3 flex items-center"
                       aria-label="Toggle password visibility"
+                      onClick={() => setShowPassword(!showPassword)}
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -144,7 +153,7 @@ export default function LoginPage() {
                     type="submit" 
                     className="h-12 px-8 py-4 bg-gradient-to-b from-[#957748] to-[#ac8b57] rounded-[10px] outline outline-1 outline-offset-[-1px] outline-[#a89578] inline-flex justify-center items-center transition-colors hover:brightness-110"
                   >
-                    <span className="text-center text-white font-semibold font-serif uppercase tracking-tight">LOGIN</span>
+                    <span className="text-center text-white font-semibold font-serif uppercase tracking-tight"> {isSubmitting ? 'LOGGING IN...' : 'LOGIN'}</span>
                   </button>
                 </div>
               </form>
