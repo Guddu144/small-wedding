@@ -49,7 +49,6 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
   const [activeTab, setActiveTab] = useState('venue');
   const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
   const router = useRouter();
-  // const [favorites, setFavorites] = useState<{[key: string]: boolean}>({});
   const [formstate, setFormstate] = useState<"add"|"edit">("add");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [wishlist, setWishlist] = useState<string[]>([]);
@@ -79,14 +78,6 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
     const handleLogout = () => {
       signOut(() => router.push('/'));
     };
-
-  // const toggleFavorite = async (id: string) => {
-  //   setFavorites(prev => ({
-  //     ...prev,
-  //     [id]: !prev[id]
-  //   }));
-  //   await handleWishList(userEmail, id.toString());
-  // };
 
   const deleteVenue = async (venue_id: string) => {
     setLoading(true);
@@ -120,54 +111,6 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
     if (confirm("Are you sure you want to delete this venue?")) {
       await deleteVenue(venue_id);
       await fetchNewData();
-    }
-  };
-
-  // const handleWishList = async (userEmail: string, venueId: string) => {
-  //   setLoading(true);
-  //   try {
-  //     const res = await fetch(
-  //       `${process.env.NEXT_PUBLIC_URL}/api/venues/wishlist/post`,
-  //       {
-  //         method: "POST",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: JSON.stringify({
-  //           venue_id: venueId,
-  //           userId: userEmail,
-  //         }),
-  //       }
-  //     );
-
-  //     const data = await res.json();
-  //     if (!res.ok) {
-  //     const errorMessage = data.apiError?.error || data.error || "Failed to update wishlist";
-  //     toast.error(errorMessage);
-  //     return;
-  //   }
-    
-  //       toast.success(data.message|| "Wishlist item created successfully!");
-  //       router.refresh();
-  //   } catch (error) {
-  //     console.error("Post error:", error);
-  //     alert("Something went wrong");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  const fetchVenueById = async (venueId: string) => {
-    try {
-      const fetchData= await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/venues/getone?venue_id=${venueId}`,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        }
-      )
-      const data = await fetchData.json();
-      setSelectedVenue(data);
-    } catch (error) {
-      console.log(error);
     }
   };
 
@@ -395,7 +338,7 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
                       </button>
                       <button className="p-2 border border-gray-200 rounded hover:bg-gray-100"  onClick={async () => {
                             setDrawerOpen(true); 
-                            fetchVenueById(venue.venueId);
+                            setSelectedVenue(venue);
                             setFormstate("edit");
                           }}>
                         <svg className="w-5 h-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -417,7 +360,7 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
           )}
         </div>
       </main>
-      <AddVenueForm value={selectedVenue?.result} fetchNewData={fetchNewData}  drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} formstate={formstate} userRole={userRole} userEmail={userEmail}/>
+      <AddVenueForm value={selectedVenue} fetchNewData={fetchNewData}  drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} formstate={formstate} userRole={userRole} userEmail={userEmail}/>
     </div>
   );
 };

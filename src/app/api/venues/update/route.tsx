@@ -28,6 +28,7 @@ export async function PATCH(request: Request) {
 
     if (!response.ok) {
       const errorText = await response.text(); // capture backend error message
+      console.log("PATCH Error:", errorText);
       throw new Error(`API error: ${response.status} - ${errorText}`);
     }
 

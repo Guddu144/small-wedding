@@ -39,9 +39,10 @@ export interface Venue {
 interface UserProps {
   userRole: string;
   userEmail: string;
+  userId: string;
 }
 
-const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
+const Venues: React.FC<UserProps> = ({ userRole, userEmail,userId }) => {
   const { signOut } = useClerk();
   const [venues, setVenues] = useState<Venue[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -59,7 +60,7 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
   const fetchNewData = async () => {
     setLoading(true);
     try {
-      const fetchData = await fetchGetVenueData();
+      const fetchData = await fetchGetVenueData(1,10,userId);
       const sortedVenues = fetchData.result.venues.sort(
         (a: Venue, b: Venue) =>
           new Date(b.created_date).getTime() -
@@ -267,6 +268,7 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
                     src={venue.gallery[0]}
                     alt={venue.venue_name}
                     fill
+                    sizes="(max-width: 768px) 100vw, 1200px"
                     className="object-cover"
                   />
                   {/* Heart icon in the corner */}

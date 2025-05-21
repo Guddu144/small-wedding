@@ -9,9 +9,9 @@ import UserDashboard from "@/components/Dashboard/Users/UserDashboard";
 const page = async() => {
   const user= await currentUser()
 
-  const userRole= user?.unsafeMetadata?.userRole as string;
+    const userRole= user?.unsafeMetadata?.userRole as string;
     const userEmail=user?.emailAddresses[0]?.emailAddress as string;
-  console.log(user,'user')
+    const userId=user?.id as string;
   return <>
 {/* <h1 className="text-center text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight leading-snug mt-6 mb-4">
   User Role of Current User is{' '}
@@ -23,7 +23,7 @@ const page = async() => {
   {
     userRole==="venueowner"? 
     <Venues userRole={userRole} userEmail={userEmail}/>:
-    <UserDashboard userEmail={userEmail} userRole={userRole}/>
+    <UserDashboard userEmail={userEmail} userRole={userRole} userId={userId}/>
   }
   </>;
 };
