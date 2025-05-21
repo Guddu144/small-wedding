@@ -50,7 +50,6 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail, userId }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [activeTab, setActiveTab] = useState('venue');
   const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
   const router = useRouter();
   const [favorites, setFavorites] = useState<{[key: string]: boolean}>({});
@@ -279,9 +278,21 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail, userId }) => {
             />
           </div>
           <div className="flex items-center gap-3 relative" ref={dropdownRef}>
-            <svg className="w-5 h-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
-            </svg>
+            <div className="relative">
+              <svg 
+                        className={`w-5 h-5  }`} 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        viewBox="0 0 20 20" 
+                        fill="currentColor"
+                      >
+                <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+              </svg>         
+              {venues.filter(v => v.is_wishlist).length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {venues.filter(v => v.is_wishlist).length}
+                </span>
+              )}
+            </div>
             <div className="w-8 h-8 bg-[#a89578] rounded-full flex items-center justify-center text-white">
               <span>P</span>
             </div>
