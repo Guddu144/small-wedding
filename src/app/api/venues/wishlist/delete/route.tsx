@@ -3,12 +3,11 @@ import { NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 
 export async function DELETE(request: Request) {
-  const { venueId, userId, wishlistId } = await request.json();
-  console.log(venueId, wishlistId);
+  const { venueId, userId } = await request.json();
   try {
-    if (!venueId || !userId || !wishlistId) {
+    if (!venueId || !userId ) {
       return NextResponse.json(
-        { error: "Missing venueId or userId or wishlistId" },
+        { error: "Missing venueId or userId" },
         { status: 400 }
       );
     }
@@ -22,7 +21,6 @@ export async function DELETE(request: Request) {
         },
         body: JSON.stringify({
           userId: userId,
-          wishlistId:wishlistId,
           venueId: venueId,
         }),
       }

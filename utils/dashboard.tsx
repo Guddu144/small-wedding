@@ -13,24 +13,14 @@ export const fetchOfficeData = async () => {
     }
   };
 
-export const fetchGetVenueData = async (page = 1, limit = 9, userId?: string) => {
+export const fetchGetVenueData = async (page = 1, limit = 9,userId?:string) => {
   try {
-    const queryParams = new URLSearchParams({
-      page: String(page),
-      limit: String(limit),
-    });
-
-    if (userId) {
-      queryParams.append("userid", userId);
-    }
-
-    const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/venues/get?${queryParams.toString()}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/venues/get?start=0&page=${page}&limit=${limit}&user_id=${userId}`, {
       headers: {
         "Content-Type": "application/json",
       },
       next: { revalidate: 0 },
     });
-
     const data = await res.json();
     return data;
   } catch (error) {

@@ -34,6 +34,7 @@ export interface Venue {
   description: string;
   venue_type: string;
   created_date: string;
+  is_wishlist: boolean;
 }
 
 interface UserProps {
@@ -42,7 +43,7 @@ interface UserProps {
   userId: string;
 }
 
-const Venues: React.FC<UserProps> = ({ userRole, userEmail,userId }) => {
+const Venues: React.FC<UserProps> = ({ userRole, userEmail, userId }) => {
   const { signOut } = useClerk();
   const [venues, setVenues] = useState<Venue[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -55,17 +56,29 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail,userId }) => {
   const [favorites, setFavorites] = useState<{[key: string]: boolean}>({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
-  const [wishlist, setWishlist] = useState<string[]>([]);
 
   const fetchNewData = async () => {
     setLoading(true);
     try {
-      const fetchData = await fetchGetVenueData(1,10,userId);
+      const fetchData = await fetchGetVenueData(1, 10, userEmail);
       const sortedVenues = fetchData.result.venues.sort(
         (a: Venue, b: Venue) =>
           new Date(b.created_date).getTime() -
           new Date(a.created_date).getTime()
       );
+      
+      // Initialize favorites state based on is_wishlist property
+      const initialFavorites: {[key: string]: boolean} = {};
+      // const initialWishlist: string[] = [];
+      
+      // sortedVenues.forEach(venue => {
+      //   initialFavorites[venue.venueId] = venue.is_wishlist;
+      //   if (venue.is_wishlist) {
+      //     initialWishlist.push(venue.venueId);
+      //   }
+      // });
+      
+      setFavorites(initialFavorites);
       setVenues(sortedVenues);
     } catch (error) {
       console.log(error);
@@ -78,19 +91,36 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail,userId }) => {
     fetchNewData();
   }, []);
 
-    const handleLogout = () => {
-      signOut(() => router.push('/'));
-    };
-
-  const toggleFavorite = async (id: string) => {
-    setFavorites(prev => ({
-      ...prev,
-      [id]: !prev[id]
-    }));
-    await handleWishList(userEmail, id.toString());
+  const handleLogout = () => {
+    signOut(() => router.push('/'));
   };
 
-  const handleWishList = async (userEmail: string, venueId: string) => {
+  const toggleFavorite = async (id: string) => {
+    const isCurrentlyInWishlist = favorites[id] || venues.find(v => v.venueId === id)?.is_wishlist;
+    
+    // Update UI immediately for better user experience
+    setFavorites(prev => ({
+      ...prev,
+      [id]: !isCurrentlyInWishlist
+    }));
+    
+    // Update the venue's is_wishlist property in the venues state
+    setVenues(prev => 
+      prev.map(venue => 
+        venue.venueId === id 
+          ? { ...venue, is_wishlist: !isCurrentlyInWishlist } 
+          : venue
+      )
+    );
+    
+    if (isCurrentlyInWishlist) {
+      await handleRemoveWishList(userEmail, id.toString());
+    } else {
+      await handleAddWishList(userEmail, id.toString());
+    }
+  };
+
+  const handleAddWishList = async (userEmail: string, venueId: string) => {
     setLoading(true);
     try {
       const res = await fetch(
@@ -111,13 +141,92 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail,userId }) => {
         toast.success("Venue added to Wishlist!");
         router.refresh();
       } else {
-      const errorMessage = data.apiError?.error || data.error || "Failed to update wishlist";
-      toast.error(errorMessage);
-      return;
+        const errorMessage = data.apiError?.error || data.error || "Failed to update wishlist";
+        toast.error(errorMessage);
+        // Revert UI changes if API call fails
+        setFavorites(prev => ({
+          ...prev,
+          [venueId]: false
+        }));
+        setVenues(prev => 
+          prev.map(venue => 
+            venue.venueId === venueId 
+              ? { ...venue, is_wishlist: false } 
+              : venue
+          )
+        );
       }
     } catch (error) {
       console.error("Post error:", error);
-      alert("Something went wrong");
+      toast.error("Something went wrong");
+      // Revert UI changes if API call fails
+      setFavorites(prev => ({
+        ...prev,
+        [venueId]: false
+      }));
+      setVenues(prev => 
+        prev.map(venue => 
+          venue.venueId === venueId 
+            ? { ...venue, is_wishlist: false } 
+            : venue
+        )
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRemoveWishList = async (userEmail: string, venueId: string) => {
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/venues/wishlist/delete/`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            venueId: venueId,
+            userId: userEmail,
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success("Venue removed from Wishlist!");
+        router.refresh();
+      } else {
+        const errorMessage = data.apiError?.error || data.error || "Failed to remove from wishlist";
+        toast.error(errorMessage);
+        // Revert UI changes if API call fails
+        setFavorites(prev => ({
+          ...prev,
+          [venueId]: true
+        }));
+        setVenues(prev => 
+          prev.map(venue => 
+            venue.venueId === venueId 
+              ? { ...venue, is_wishlist: true } 
+              : venue
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Remove error:", error);
+      toast.error("Something went wrong");
+      // Revert UI changes if API call fails
+      setFavorites(prev => ({
+        ...prev,
+        [venueId]: true
+      }));
+      setVenues(prev => 
+        prev.map(venue => 
+          venue.venueId === venueId 
+            ? { ...venue, is_wishlist: true } 
+            : venue
+        )
+      );
     } finally {
       setLoading(false);
     }
@@ -130,11 +239,10 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail,userId }) => {
       venue.address.country.toLowerCase().includes(term) ||
       venue.address.city.toLowerCase().includes(term) ||
       venue.address.state.toLowerCase().includes(term)
-    
     );
   });
 
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
 
@@ -147,7 +255,6 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail,userId }) => {
     setIsModalOpen(false);
   };
 
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -156,8 +263,8 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail,userId }) => {
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           venue={selectedVenue}
-          onAddToWishlist={() => handleWishList(userEmail, selectedVenue.venueId)}
-          isInWishlist={wishlist.includes(selectedVenue.venueId)}
+          onAddToWishlist={() => toggleFavorite(selectedVenue.venueId)}
+          isInWishlist={selectedVenue.is_wishlist || favorites[selectedVenue.venueId] || false}
         />
       )}
       <header className="bg-[#0a3b5b] text-white px-3 py-3">
@@ -173,8 +280,8 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail,userId }) => {
           </div>
           <div className="flex items-center gap-3 relative" ref={dropdownRef}>
             <svg className="w-5 h-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
-                      </svg>
+              <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+            </svg>
             <div className="w-8 h-8 bg-[#a89578] rounded-full flex items-center justify-center text-white">
               <span>P</span>
             </div>
@@ -276,9 +383,14 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail,userId }) => {
                     <button 
                       className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-colors"
                       onClick={() => toggleFavorite(venue.venueId)}
-                      aria-label={favorites[venue.venueId] ? "Remove from favorites" : "Add to favorites"}
+                      aria-label={favorites[venue.venueId] || venue.is_wishlist ? "Remove from favorites" : "Add to favorites"}
                     >
-                      <svg className={`w-5 h-5 ${favorites[venue.venueId] ? 'text-red-500' : 'text-gray-300'}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <svg 
+                        className={`w-5 h-5 ${(favorites[venue.venueId] || venue.is_wishlist) ? 'text-red-500' : 'text-gray-300'}`} 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        viewBox="0 0 20 20" 
+                        fill="currentColor"
+                      >
                         <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
                       </svg>
                     </button>

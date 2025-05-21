@@ -8,9 +8,10 @@ export async function GET(request:Request) {
       },
       next: { revalidate: 0 }, // Revalidate the cache every 50 seconds
     };
-
+    const url = new URL(request.url);
+    const userId = url.searchParams.get("user_id");
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_VENUE_URL}/venues?limit=25&start_key=0`,
+      `${process.env.NEXT_PUBLIC_API_VENUE_URL}/venues?limit=25&start_key=0&user_id=${userId}`,
       reqOptions
     );
     if (!response.ok) {
