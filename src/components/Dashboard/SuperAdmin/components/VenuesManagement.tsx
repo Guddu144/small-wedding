@@ -39,7 +39,7 @@ export default function VenuesManagement({ userEmail }: { userEmail: string }) {
   const fetchNewData = async () => {
     setLoading(true);
     try {
-      const fetchData = await fetchGetVenueData(1, 68, userEmail, 'superadmin');
+      const fetchData = await fetchGetVenueData(1, 600, userEmail, 'superadmin');
       const sortedVenues = fetchData.result.venues.sort(
         (a: Venue, b: Venue) =>
           new Date(b.created_date).getTime() -
