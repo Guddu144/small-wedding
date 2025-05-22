@@ -1,37 +1,35 @@
 import { NextResponse } from "next/server";
-import { uploadFilesToS3 } from "../../../../../utils/uploadFilesTos3";
-import toast from "react-hot-toast";
 export const dynamic = "force-dynamic";
-
-
 
 export async function POST(request: Request) {
   try {
-    const formData = await request.formData();
-    const body: any = {};
+    const jsonData = await request.json();
+    
+    // Prepare the body with address mapping
+    const body: any = {
+      ...jsonData,
+    };
+    
+    // Handle address mapping - convert zip to zip_code
+    if (jsonData.address) {
+      body.address = {
+        country: jsonData.address.country,
+        state: jsonData.address.state,
+        city: jsonData.address.city,
+        street: jsonData.address.street,
+        zip_code: jsonData.address.zip, // Map zip to zip_code
+      };
+    }
+    
+    // Gallery URLs are already provided from frontend
+    body.gallery = jsonData.gallery || [];
 
-    formData.forEach((value, key) => {
-      if (["country", "state", "city", "street", "zip_code"].includes(key)) {
-        body.address = {
-          ...body.address,
-          [key]: value,
-        };
-      } else {
-        body[key] = value;
-      }
-    });
-
-    body.user_role = "superadmin";
-
+    // Validate body structure
     if (typeof body !== 'object' || Array.isArray(body)) {
-      throw new Error("Invalid form data format: Expected an object");
+      throw new Error("Invalid request data format: Expected an object");
     }
 
-    const galleryFiles = formData.getAll('gallery') as File[];
-    const uploadedFiles = await uploadFilesToS3(galleryFiles);
-    const galleryUrls = uploadedFiles.map(file => file.url);
-    body.gallery = galleryUrls;
-
+    // Prepare request to external API
     const reqOptions = {
       method: "POST",
       headers: {
@@ -41,15 +39,16 @@ export async function POST(request: Request) {
       body: JSON.stringify(body),
     };
 
+
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_VENUE_URL}/venues`,
       reqOptions
     );
 
-    if (response.ok) {
-        toast.success("Venue created successfully!");
-      } else {
-      throw new Error(`Failed to post data: ${response.statusText}`);
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error("External API Error:", errorData);
+      throw new Error(`Failed to post data: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -58,7 +57,7 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error("Error posting data:", error.message);
     return NextResponse.json(
-      { error: "Failed to post data" },
+      { error: error.message || "Failed to post data" },
       { status: 500 }
     );
   }
