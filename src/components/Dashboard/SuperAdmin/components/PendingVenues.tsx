@@ -58,11 +58,34 @@ export default function PendingVenues() {
   }
 };
   // Handle venue rejection
-  const handleRejectVenue = (id: string) => {
-    // Here you would call an API to reject the venue
-    setPendingVenues(pendingVenues?.filter(venue => venue.venueId !== id));
-    alert(`Venue ID: ${id} has been rejected`);
-  };
+const handleRejectVenue = async (id: string) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_URL}/api/venues/update?venue_id=${id}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          venue_status: "reject",
+          user_role: 'superadmin'
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to reject the venue');
+    }
+
+    const result = await response.json();
+    setPendingVenues(prev => prev.filter(venue => venue.venueId !== id));
+    toast.success('Venue rejected successfully!');
+  } catch (error) {
+    console.error(error);
+    toast.error('There was an error rejecting the venue.');
+  }
+};
 
   return (
     <div>

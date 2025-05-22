@@ -264,7 +264,7 @@ export default function VenuesManagement({ userEmail }: { userEmail: string }) {
       {/* Page Title and Add Button */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-serif text-[#0a3b5b]">VENUES MANAGEMENT</h1>
-        <button
+        {/* <button
           className="flex items-center gap-2 bg-[#0a3b5b] text-white px-4 py-2 rounded-lg"
           onClick={handleAddNewVenue}
         >
@@ -272,7 +272,7 @@ export default function VenuesManagement({ userEmail }: { userEmail: string }) {
             <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
           </svg>
           ADD NEW VENUE
-        </button>
+        </button> */}
       </div>
       {loading && (
         <div className="flex justify-center items-center py-12">
