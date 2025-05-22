@@ -1,60 +1,55 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 type Enquiry = {
-  id: number;
-  name: string;
+  enquiryId: string;
   email: string;
-  phone: string;
+  phoneNumber: string;
   subject: string;
-  message: string;
-  status: 'new' | 'in-progress' | 'resolved';
-  createdAt: string;
+  description: string;
+  status: string;
+  timestamp: string;
 };
 
 export default function EnquiriesManagement() {
-  const [enquiries, setEnquiries] = useState<Enquiry[]>([
-    {
-      id: 1,
-      name: 'Robert Anderson',
-      email: 'robert@example.com',
-      phone: '555-123-4567',
-      subject: 'Venue Availability',
-      message: 'I would like to know the availability of River View Halls for a celebration of life event in March.',
-      status: 'new',
-      createdAt: '2023-12-01T10:30:00'
-    },
-    {
-      id: 2,
-      name: 'Jennifer Wilson',
-      email: 'jennifer@example.com',
-      phone: '555-987-6543',
-      subject: 'Special Requirements',
-      message: 'We have some dietary restrictions for our event. Can you accommodate vegan and gluten-free options?',
-      status: 'in-progress',
-      createdAt: '2023-12-05T14:15:00'
-    },
-    {
-      id: 3,
-      name: 'Thomas Brown',
-      email: 'thomas@example.com',
-      phone: '555-567-8901',
-      subject: 'Pricing Questions',
-      message: 'Could you please provide more information about your packages and pricing for a 50-person gathering?',
-      status: 'resolved',
-      createdAt: '2023-11-28T09:45:00'
-    }
-  ]);
+  const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentEnquiry, setCurrentEnquiry] = useState<Enquiry | null>(null);
   const [formData, setFormData] = useState({
-    status: 'new' as 'new' | 'in-progress' | 'resolved',
+    status: '',
     reply: ''
   });
+
+  // Fetch enquiries from API
+  const fetchEnquiries = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/enquires`);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch enquiries: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      setEnquiries(data.result.enquiries);
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching enquiries:", err);
+      setError("Failed to load enquiries. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEnquiries();
+  }, []);
 
   // Handle form input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -88,39 +83,115 @@ export default function EnquiriesManagement() {
   };
 
   // Update enquiry status
-  const handleSubmitEdit = (e: React.FormEvent) => {
+  const handleSubmitEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (currentEnquiry) {
-      setEnquiries(enquiries.map(enquiry => 
-        enquiry.id === currentEnquiry.id 
-          ? { ...enquiry, status: formData.status } 
-          : enquiry
-      ));
-      setIsEditModalOpen(false);
+      try {
+        // Here you would typically make an API call to update the enquiry
+        // For now, we'll just update the local state
+        setEnquiries(enquiries.map(enquiry => 
+          enquiry.enquiryId === currentEnquiry.enquiryId
+            ? { ...enquiry, status: formData.status } 
+            : enquiry
+        ));
+        setIsEditModalOpen(false);
+        
+        // If you had an API endpoint to update enquiries:
+        /*
+        const response = await fetch(`/api/enquiries/${currentEnquiry.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            status: formData.status,
+            reply: formData.reply
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update enquiry');
+        }
+
+        // Refresh the list after update
+        await fetchEnquiries();
+        */
+      } catch (error) {
+        console.error("Error updating enquiry:", error);
+        alert("Failed to update enquiry. Please try again.");
+      }
     }
   };
 
   // Delete enquiry
-  const handleDeleteEnquiry = () => {
+  const handleDeleteEnquiry = async () => {
     if (currentEnquiry) {
-      setEnquiries(enquiries.filter(enquiry => enquiry.id !== currentEnquiry.id));
-      setIsDeleteModalOpen(false);
+      try {
+        // Here you would typically make an API call to delete the enquiry
+        // For now, we'll just update the local state
+        setEnquiries(enquiries.filter(enquiry => enquiry.enquiryId !== currentEnquiry.enquiryId));
+        setIsDeleteModalOpen(false);
+        
+        // If you had an API endpoint to delete enquiries:
+        /*
+        const response = await fetch(`/api/enquiries/${currentEnquiry.id}`, {
+          method: 'DELETE',
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to delete enquiry');
+        }
+
+        // Refresh the list after deletion
+        await fetchEnquiries();
+        */
+      } catch (error) {
+        console.error("Error deleting enquiry:", error);
+        alert("Failed to delete enquiry. Please try again.");
+      }
     }
   };
 
-  // Get status badge class
-  const getStatusBadgeClass = (status: 'new' | 'in-progress' | 'resolved') => {
-    if (status === 'new') return 'bg-blue-100 text-blue-800 border border-blue-200';
-    if (status === 'in-progress') return 'bg-yellow-100 text-yellow-800 border border-yellow-200';
-    return 'bg-green-100 text-green-800 border border-green-200';
-  };
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0a3b5b]"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border-l-4 border-red-400 p-4">
+        <div className="flex">
+          <div className="flex-shrink-0">
+            <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <div className="ml-3">
+            <p className="text-sm text-red-700">{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
       {/* Page Title */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-serif text-[#0a3b5b]">ENQUIRIES MANAGEMENT</h1>
+        <button 
+          onClick={fetchEnquiries}
+          className="flex items-center gap-2 bg-[#0a3b5b] text-white px-4 py-2 rounded-lg"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Refresh
+        </button>
       </div>
 
       {/* Enquiries Table */}
@@ -129,60 +200,61 @@ export default function EnquiriesManagement() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-[#f2ede8]">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-[#0a3b5b] uppercase tracking-wider">Name</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-[#0a3b5b] uppercase tracking-wider">Email</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-[#0a3b5b] uppercase tracking-wider">Subject</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-[#0a3b5b] uppercase tracking-wider">Phone Number</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-[#0a3b5b] uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-[#0a3b5b] uppercase tracking-wider">Date</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-[#0a3b5b] uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {enquiries.map((enquiry) => (
-                <tr key={enquiry.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#0a3b5b]">{enquiry.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{enquiry.email}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{enquiry.subject}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusBadgeClass(enquiry.status)}`}>
-                      {enquiry.status === 'in-progress' ? 'In Progress' : 
-                       enquiry.status === 'resolved' ? 'Resolved' : 'New'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {new Date(enquiry.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex justify-end gap-2">
-                      <button 
-                        onClick={() => handleViewEnquiry(enquiry)}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                      </button>
-                      <button 
-                        onClick={() => handleEditEnquiry(enquiry)}
-                        className="text-indigo-600 hover:text-indigo-900"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                        </svg>
-                      </button>
-                      <button 
-                        onClick={() => handleDeleteClick(enquiry)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
-                    </div>
+              {enquiries.length > 0 ? (
+                enquiries.map((enquiry) => (
+                  <tr key={enquiry.enquiryId} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#0a3b5b]">{enquiry.email}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{enquiry.phoneNumber}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{enquiry.status}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      {new Date(enquiry.timestamp).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex justify-end gap-2">
+                        <button 
+                          onClick={() => handleViewEnquiry(enquiry)}
+                          className="text-blue-600 hover:text-blue-900"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                        </button>
+                        {/* <button 
+                          onClick={() => handleEditEnquiry(enquiry)}
+                          className="text-indigo-600 hover:text-indigo-900"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                          </svg>
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteClick(enquiry)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button> */}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
+                    No enquiries found
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
@@ -190,7 +262,7 @@ export default function EnquiriesManagement() {
 
       {/* View Enquiry Modal */}
       {isViewModalOpen && currentEnquiry && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/60 bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
             <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
               <h3 className="text-lg font-medium text-[#0a3b5b]">
@@ -208,40 +280,29 @@ export default function EnquiriesManagement() {
             <div className="px-6 py-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Name</p>
-                  <p className="text-[#0a3b5b]">{currentEnquiry.name}</p>
-                </div>
-                <div>
                   <p className="text-sm font-medium text-gray-500">Email</p>
                   <p className="text-[#0a3b5b]">{currentEnquiry.email}</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-500">Phone</p>
-                  <p className="text-[#0a3b5b]">{currentEnquiry.phone}</p>
+                  <p className="text-[#0a3b5b]">{currentEnquiry.phoneNumber}</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-500">Date</p>
-                  <p className="text-[#0a3b5b]">{new Date(currentEnquiry.createdAt).toLocaleString()}</p>
-                </div>
-                <div className="md:col-span-2">
-                  <p className="text-sm font-medium text-gray-500">Subject</p>
-                  <p className="text-[#0a3b5b]">{currentEnquiry.subject}</p>
+                  <p className="text-[#0a3b5b]">{new Date(currentEnquiry.timestamp).toLocaleString()}</p>
                 </div>
               </div>
               
               <div className="mb-4">
-                <p className="text-sm font-medium text-gray-500 mb-1">Message</p>
+                <p className="text-sm font-medium text-gray-500 mb-1">description</p>
                 <div className="bg-gray-50 p-3 rounded-md text-gray-700">
-                  {currentEnquiry.message}
+                  {currentEnquiry.description}
                 </div>
               </div>
 
               <div className="mb-4">
                 <p className="text-sm font-medium text-gray-500 mb-1">Status</p>
-                <span className={`px-2 py-1 rounded-full text-xs ${getStatusBadgeClass(currentEnquiry.status)}`}>
-                  {currentEnquiry.status === 'in-progress' ? 'In Progress' : 
-                   currentEnquiry.status === 'resolved' ? 'Resolved' : 'New'}
-                </span>
+                {currentEnquiry.status}
               </div>
               
               <div className="flex justify-end mt-6">
@@ -273,18 +334,14 @@ export default function EnquiriesManagement() {
               <div className="px-6 py-4">
                 <div className="mb-4">
                   <p className="text-sm font-medium text-gray-500 mb-1">From</p>
-                  <p className="text-[#0a3b5b]">{currentEnquiry.name} ({currentEnquiry.email})</p>
+                  <p className="text-[#0a3b5b]"> ({currentEnquiry.email})</p>
                 </div>
                 
-                <div className="mb-4">
-                  <p className="text-sm font-medium text-gray-500 mb-1">Subject</p>
-                  <p className="text-[#0a3b5b]">{currentEnquiry.subject}</p>
-                </div>
                 
                 <div className="mb-4">
-                  <p className="text-sm font-medium text-gray-500 mb-1">Original Message</p>
+                  <p className="text-sm font-medium text-gray-500 mb-1">Original description</p>
                   <div className="bg-gray-50 p-3 rounded-md text-gray-700 text-sm">
-                    {currentEnquiry.message}
+                    {currentEnquiry.description}
                   </div>
                 </div>
                 
@@ -303,7 +360,7 @@ export default function EnquiriesManagement() {
                 </div>
                 
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Reply Message</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Reply description</label>
                   <textarea
                     name="reply"
                     value={formData.reply}
@@ -348,7 +405,7 @@ export default function EnquiriesManagement() {
               </div>
               <h3 className="text-lg font-medium text-gray-900 text-center mb-2">Delete Enquiry</h3>
               <p className="text-sm text-gray-500 text-center">
-                Are you sure you want to delete this enquiry from {currentEnquiry.name}? This action cannot be undone.
+                Are you sure you want to delete this enquiry from {currentEnquiry.email}? This action cannot be undone.
               </p>
             </div>
             <div className="px-6 py-3 border-t border-gray-200 flex justify-end gap-3">
@@ -372,4 +429,4 @@ export default function EnquiriesManagement() {
       )}
     </div>
   );
-} 
+}
