@@ -22,7 +22,7 @@ export interface Venue {
     state: string;
     city: string;
     street: string;
-    zip_code: string;
+    zip: string;
   };
   region_state: string;
   featured_venue: boolean;
@@ -30,7 +30,7 @@ export interface Venue {
   description: string;
   venue_type: string;
   created_date: string;
-  status?: string;
+  venue_status?: string;
 }
 
 interface UserProps {

@@ -11,7 +11,7 @@ const AddVenueDrawer = ({ value, drawerOpen, setDrawerOpen, userRole, userEmail,
   const [loading, setLoading] = useState(false);
   
   const initialFormState = {
-    user_role: "admin",
+    user_role: "venueowner",
     venue_user: userEmail,
     venue_name: "",
     phone_no: "",
@@ -55,7 +55,7 @@ const AddVenueDrawer = ({ value, drawerOpen, setDrawerOpen, userRole, userEmail,
     }
     else if (drawerOpen && value) {
       setFormData({
-        user_role: "admin",
+        user_role: "venueowner",
         venue_user: userEmail,
         venue_name: value?.venue_name || "",
         phone_no: value?.phone_no || "",
