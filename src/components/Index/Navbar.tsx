@@ -138,52 +138,84 @@ export default function Navbar() {
       </div>
 
       {/* Mobile Navigation */}
-      {isMenuOpen && (
-        <nav className="lg:hidden mt-4 flex flex-col space-y-4 px-6 bg-navy-950/80 backdrop-blur-sm rounded-lg p-4">
-          <Link
-            href="/our-story"
-            className="hover:text-gold-400 transition-colors py-2"
-            tabIndex={0}
-            aria-label="Our Story"
-          >
-            OUR STORY
-          </Link>
-          <Link
-            href="#services"
-            className="hover:text-gold-400 transition-colors py-2"
-            tabIndex={0}
-            aria-label="Services"
-          >
-            SERVICES
-          </Link>
-          <Link
-            href="#venues"
-            className="hover:text-gold-400 transition-colors py-2"
-            tabIndex={0}
-            aria-label="Venues"
-          >
-            VENUES
-          </Link>
-          <Link
-            href="#contact"
-            className="hover:text-gold-400 transition-colors py-2"
-            tabIndex={0}
-            aria-label="Contact"
-          >
-            CONTACT
-          </Link>
-          <Link
-            href="#planning"
-            className="h-12 px-6 py-4 bg-gradient-to-b from-[#957748] to-[#ac8b57] rounded-[10px] outline outline-1 outline-offset-[-1px] outline-[#a89578] inline-flex justify-center items-center gap-2.5 transition-colors hover:brightness-110 w-full"
-            tabIndex={0}
-            aria-label="Get Started"
-          >
-            <div className="text-center justify-start text-white text-base font-semibold font-['Lora'] uppercase leading-[14px] tracking-tight">
-              Get Started
-            </div>
-          </Link>
-        </nav>
-      )}
+{isMenuOpen && (
+  <nav className="lg:hidden mt-4 flex flex-col space-y-4 px-6 bg-navy-950/80 backdrop-blur-sm rounded-lg p-4">
+    <Link
+      href="/our-story"
+      className="hover:text-gold-400 transition-colors py-2"
+      tabIndex={0}
+      aria-label="Our Story"
+      onClick={handleMenuToggle}
+    >
+      OUR STORY
+    </Link>
+    <Link
+      href="/services"
+      className="hover:text-gold-400 transition-colors py-2"
+      tabIndex={0}
+      aria-label="Services"
+      onClick={handleMenuToggle}
+    >
+      SERVICES
+    </Link>
+    <Link
+      href="/venues"
+      className="hover:text-gold-400 transition-colors py-2"
+      tabIndex={0}
+      aria-label="Venues"
+      onClick={handleMenuToggle}
+    >
+      VENUES
+    </Link>
+    <Link
+      href="#contact"
+      className="hover:text-gold-400 transition-colors py-2"
+      tabIndex={0}
+      aria-label="Contact"
+      onClick={handleMenuToggle}
+    >
+      CONTACT
+    </Link>
+    
+    <SignedIn>
+      <Link
+        href="/dashboard"
+        className="hover:text-gold-400 transition-colors py-2"
+        tabIndex={0}
+        aria-label="dashboard"
+        onClick={handleMenuToggle}
+      >
+        DASHBOARD
+      </Link>
+    </SignedIn>
+    
+    <SignedOut>
+      <Link 
+        href="/login" 
+        tabIndex={0} 
+        aria-label="Login"
+        className="w-full py-2 text-center hover:text-gold-400 transition-colors"
+        onClick={handleMenuToggle}
+      >
+        LOGIN
+      </Link>
+    </SignedOut>
+    
+    <SignedOut>
+      <Link
+        href="/get-started"
+        className="h-12 px-6 py-4 bg-gradient-to-b from-[#957748] to-[#ac8b57] rounded-[10px] outline outline-1 outline-offset-[-1px] outline-[#a89578] inline-flex justify-center items-center gap-2.5 transition-colors hover:brightness-110 w-full"
+        tabIndex={0}
+        aria-label="Get Started"
+        onClick={handleMenuToggle}
+      >
+        <div className="text-center justify-start text-white text-base font-semibold font-['Lora'] uppercase leading-[14px] tracking-tight">
+          Get Started
+        </div>
+      </Link>
+    </SignedOut>
+  </nav>
+)}
     </header>
   );
 }
