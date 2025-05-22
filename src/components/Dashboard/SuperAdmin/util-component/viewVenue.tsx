@@ -71,7 +71,7 @@ const ViewVenueModal: React.FC<Props> = ({
 
               <div className="mb-4">
                 <p className="text-sm font-medium text-gray-500">Address</p>
-                <p className="text-[#0a3b5b]">{currentVenue.address.country}</p>
+                <p className="text-[#0a3b5b]">{`${currentVenue.address?.country},${currentVenue.address?.state},${currentVenue.address?.city},${currentVenue.address?.street}`}</p>
               </div>
 
               <div className="mb-4">
