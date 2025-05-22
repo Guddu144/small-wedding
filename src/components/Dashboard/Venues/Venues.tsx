@@ -10,6 +10,7 @@ import Image from "next/image";
 import AddVenueForm from "./AddVenue";
 import { useClerk } from "@clerk/nextjs";
 import VenueModal from "./Popup/ViewMore";
+import Link from "next/link";
 export interface Venue {
   user_role: string;
   venueId: string;
@@ -163,7 +164,7 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
             )}
       <header className="bg-[#0a3b5b] text-white px-3 py-3">
         <div className="container mx-auto flex justify-between items-center">
-          <div>
+          <Link href="/" aria-label="Honoring Lifetimes">
             <Image 
               src="/images/logos/logo.svg" 
               alt="Honoring Lifetimes" 
@@ -171,7 +172,7 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail }) => {
               height={50}
               priority
             />
-          </div>
+          </Link>
           <div className="flex items-center gap-3 relative" ref={dropdownRef}>
             <div className="w-8 h-8 bg-[#a89578] rounded-full flex items-center justify-center text-white">
               <span>P</span>

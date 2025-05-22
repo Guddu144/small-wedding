@@ -11,6 +11,7 @@ import EnquiriesManagement from './components/EnquiriesManagement';
 import VenueReassignments from './components/VenueReassignments';
 import VenuesManagement from './components/VenuesManagement';
 import { useClerk } from '@clerk/nextjs';
+import Link from 'next/link';
 
 export default function SuperAdminDashboard({ userRole,userEmail }: { userRole: string,userEmail:string }) {
   const router = useRouter();
@@ -44,7 +45,7 @@ export default function SuperAdminDashboard({ userRole,userEmail }: { userRole: 
       {/* Header */}
       <header className="bg-[#0a3b5b] text-white px-3 py-3">
         <div className="container mx-auto flex justify-between items-center">
-          <div>
+          <Link href="/" aria-label="Honoring Lifetimes">
             <Image 
               src="/images/logos/logo.svg" 
               alt="Celebration of Life Concierge" 
@@ -52,7 +53,7 @@ export default function SuperAdminDashboard({ userRole,userEmail }: { userRole: 
               height={50}
               priority
             />
-          </div>
+          </Link>
           <div className="flex items-center gap-4 relative" ref={dropdownRef}>
             <div className="h-8 w-8 flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

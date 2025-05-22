@@ -69,7 +69,7 @@ export default function Navbar() {
             VENUES
           </Link>
           <Link
-            href="#contact"
+            href="/contact"
             className="hover:text-gold-400 transition-colors"
             tabIndex={0}
             aria-label="Contact"
@@ -168,7 +168,7 @@ export default function Navbar() {
       VENUES
     </Link>
     <Link
-      href="#contact"
+      href="/contact"
       className="hover:text-gold-400 transition-colors py-2"
       tabIndex={0}
       aria-label="Contact"

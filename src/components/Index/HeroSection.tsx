@@ -66,7 +66,7 @@ export default function HeroSection() {
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4 w-full">
           <Link 
-            href="#planning" 
+            href="/contact" 
             className="h-12 px-6 py-4 bg-gradient-to-b from-[#957748] to-[#ac8b57] rounded-[10px] outline outline-1 outline-offset-[-1px] outline-[#a89578] inline-flex justify-center items-center gap-2.5 transition-colors hover:brightness-110 w-full sm:w-auto" 
             tabIndex={0}
             aria-label="Let's Start Planning"

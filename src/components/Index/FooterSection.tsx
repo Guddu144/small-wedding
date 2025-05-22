@@ -25,10 +25,10 @@ export default function FooterSection() {
         {/* Navigation Links */}
         <nav className="flex flex-wrap justify-center items-center gap-4 md:gap-8 mb-8 mr-8">
           <Link href="/our-story" className="text-white font-serif text-sm md:text-lg font-semibold hover:text-gold-400 transition-colors">OUR STORY</Link>
-          <Link href="#services" className="text-white font-serif text-sm md:text-lg font-semibold hover:text-gold-400 transition-colors">SERVICES</Link>
-          <Link href="#planning" className="h-12 px-6 py-4 bg-gradient-to-b from-[#957748] to-[#ac8b57] rounded-[10px] outline outline-1 outline-offset-[-1px] outline-[#a89578] inline-flex justify-center items-center gap-2.5 transition-colors hover:brightness-110 text-white text-base font-semibold font-['Lora'] uppercase leading-[14px] tracking-tight">LET'S START PLANING</Link>
-          <Link href="#venues" className="text-white font-serif text-sm md:text-lg font-semibold hover:text-gold-400 transition-colors">VENUES</Link>
-          <Link href="#contact" className="text-white font-serif text-sm md:text-lg font-semibold hover:text-gold-400 transition-colors">CONTACT</Link>
+          <Link href="/services" className="text-white font-serif text-sm md:text-lg font-semibold hover:text-gold-400 transition-colors">SERVICES</Link>
+          <Link href="/contact" className="h-12 px-6 py-4 bg-gradient-to-b from-[#957748] to-[#ac8b57] rounded-[10px] outline outline-1 outline-offset-[-1px] outline-[#a89578] inline-flex justify-center items-center gap-2.5 transition-colors hover:brightness-110 text-white text-base font-semibold font-['Lora'] uppercase leading-[14px] tracking-tight">LET'S START PLANING</Link>
+          <Link href="/venues" className="text-white font-serif text-sm md:text-lg font-semibold hover:text-gold-400 transition-colors">VENUES</Link>
+          <Link href="/contact" className="text-white font-serif text-sm md:text-lg font-semibold hover:text-gold-400 transition-colors">CONTACT</Link>
         </nav>
         {/* Copyright */}
         <div className="text-center w-full mt-4">

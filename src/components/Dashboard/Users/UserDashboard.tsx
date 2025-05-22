@@ -269,7 +269,7 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail, userId }) => {
       )}
       <header className="bg-[#0a3b5b] text-white px-3 py-3">
         <div className="container mx-auto flex justify-between items-center">
-          <div>
+          <Link href="/" aria-label="Honoring Lifetimes">
             <Image 
               src="/images/logos/logo.svg" 
               alt="Honoring Lifetimes" 
@@ -277,7 +277,7 @@ const Venues: React.FC<UserProps> = ({ userRole, userEmail, userId }) => {
               height={50}
               priority
             />
-          </div>
+          </Link>
           <div className="flex items-center gap-3 relative" ref={dropdownRef}>
             <div className="relative">
               <svg 

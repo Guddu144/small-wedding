@@ -9,7 +9,7 @@ import { fetchGetVenueData } from "../../../../utils/dashboard";
 import toast, { Toaster } from "react-hot-toast";
 import PopupContent from "@/components/Dashboard/Venues/Popup/PopupContent";
 import Link from "next/link";
-import { SignInButton } from "@clerk/nextjs";
+import { SignedIn } from "@clerk/nextjs";
 import Image from "next/image";
 import VenueModal from "@/components/Dashboard/Venues/Popup/ViewMore";
 
@@ -37,9 +37,10 @@ interface Venue {
 
 interface UserProps {
   userEmail: string;
+  userRole: string;
 }
 
-const VenuesPage: React.FC<UserProps> = ({ userEmail }) => {
+const VenuesPage: React.FC<UserProps> = ({ userEmail,userRole }) => {
   const [venues, setVenues] = useState<Venue[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -53,7 +54,7 @@ const VenuesPage: React.FC<UserProps> = ({ userEmail }) => {
   const fetchNewData = async () => {
     setLoading(true);
     try {
-      const fetchData = await fetchGetVenueData();
+      const fetchData = await fetchGetVenueData(1, 500, userEmail,userRole??'user');
       const sortedVenues = fetchData.result.venues.sort(
         (a: Venue, b: Venue) =>
           new Date(b.created_date).getTime() -
@@ -224,35 +225,11 @@ const [open, setOpen] = useState(false);
               <PopupContent open={open} setOpen={setOpen}/>
         {/* Venues Grid */}
         {
-        // loading ? (
-        //   <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        //     <div className="bg-white rounded-2xl border border-[#eae5da] shadow p-4 flex flex-col gap-2 items-start">
-        //       <div className="w-full h-56 bg-[#e6e6e6] rounded-[6px]"></div>
-        //       <div className="w-full h-4 bg-[#e6e6e6] rounded-[6px]"></div>
-        //       <div className="flex justify-between gap-4 w-full">
-        //         <div className="w-[120px] h-4 bg-[#e6e6e6] rounded-[6px]"></div>
-        //         <div className="w-[120px] h-4 bg-[#e6e6e6] rounded-[6px]"></div>
-        //       </div>
-        //       <div className="w-full h-4 bg-[#e6e6e6] rounded-[6px] mt-2"></div>
-        //       <div className="w-full h-4 bg-[#e6e6e6] rounded-[6px]"></div>
-
-        //       <div className="w-full h-6 bg-[#e6e6e6] rounded-[6px] mt-2"></div>
-        //     </div>
-
-        //     <div className="bg-white rounded-2xl border border-[#eae5da] shadow p-4 flex flex-col gap-2 items-start">
-        //       <div className="w-full h-56 bg-[#e6e6e6] rounded-[6px]"></div>
-        //       <div className="w-full h-4 bg-[#e6e6e6] rounded-[6px]"></div>
-        //       <div className="flex justify-between gap-4 w-full">
-        //         <div className="w-[120px] h-4 bg-[#e6e6e6] rounded-[6px]"></div>
-        //         <div className="w-[120px] h-4 bg-[#e6e6e6] rounded-[6px]"></div>
-        //       </div>
-        //       <div className="w-full h-4 bg-[#e6e6e6] rounded-[6px] mt-2"></div>
-        //       <div className="w-full h-4 bg-[#e6e6e6] rounded-[6px]"></div>
-
-        //       <div className="w-full h-6 bg-[#e6e6e6] rounded-[6px] mt-2"></div>
-        //     </div>
-        //   </div>
-        // ) :
+        loading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0a3b5b]"></div>
+          </div>
+        ) :
         (
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredVenues.length > 0 ? (
@@ -266,6 +243,7 @@ const [open, setOpen] = useState(false);
                                 className="object-cover"
                               />
                               {/* Heart icon in the corner */}
+                            <SignedIn>
                               <div className="absolute top-3 right-3 z-10">
                                 <button 
                                   className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-colors"
@@ -277,6 +255,7 @@ const [open, setOpen] = useState(false);
                                   </svg>
                                 </button>
                               </div>
+                            </SignedIn>
                             </div>
                             <div className="p-4 flex flex-col flex-grow">
                               <h3 className="text-[#0a3b5b] font-semibold text-xl mb-2">{venue.venue_name}</h3>

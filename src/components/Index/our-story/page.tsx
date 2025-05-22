@@ -1,5 +1,4 @@
-
-
+import FooterSection from "../FooterSection";
 
 export default function OurStoryPage() {
   return (
@@ -109,6 +108,7 @@ export default function OurStoryPage() {
           </div>
         </div>
       </section>
+      <FooterSection />
     </main>
   );
 } 
